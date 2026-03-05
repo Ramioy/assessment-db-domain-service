@@ -1,5 +1,7 @@
-/**
- * Controllers
- * NestJS HTTP controllers - entry points for HTTP requests
- * Controllers are driving adapters that receive external requests
- */
+export * from './product-category.controller';
+export * from './product.controller';
+export * from './stock.controller';
+export * from './customer.controller';
+export * from './transaction.controller';
+export * from './delivery.controller';
+export * from './health.controller';
