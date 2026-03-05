@@ -41,4 +41,14 @@ export const envValidationSchema = Joi.object({
   // Application Information
   APP_NAME: Joi.string().default('your-service-name'),
   APP_DESCRIPTION: Joi.string().default('service-name-description'),
+
+  // Database Configuration
+  DB_HOST: Joi.string().default('localhost'),
+  DB_PORT: Joi.number().integer().default(5432),
+  DB_USERNAME: Joi.string().required(),
+  DB_PASSWORD: Joi.string().required(),
+  DB_DATABASE: Joi.string().required(),
+  DB_SYNCHRONIZE: Joi.boolean().default(false),
+  DB_LOGGING: Joi.boolean().default(false),
+  DB_SSL: Joi.boolean().default(false),
 }).unknown(true);

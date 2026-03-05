@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { envValidationSchema } from './infrastructure/config/env.validation';
+import { databaseConfig } from './infrastructure/config/database.config';
 
 /**
  * App Module - Root NestJS module
@@ -25,6 +27,10 @@ import { envValidationSchema } from './infrastructure/config/env.validation';
         allowUnknown: true,
         abortEarly: true,
       },
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: databaseConfig,
     }),
   ],
   controllers: [],
