@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Transaction, UpdateTransactionDto } from '@domain/models/transaction.entity';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
 import { TransactionStatusRepositoryPort } from '@application/ports/out/transaction-status-repository.port';
 import { err, type Result } from '@shared/result';
@@ -15,7 +15,7 @@ export class UpdateTransactionUseCase {
     private readonly statusRepository: TransactionStatusRepositoryPort,
   ) {}
 
-  async execute(id: number, dto: UpdateTransactionDto): Promise<Result<Transaction, DomainError>> {
+  async execute(id: number, dto: UpdateTransactionDto): Promise<Result<Transaction, AppError>> {
     const findResult = await this.transactionRepository.findById(id);
     if (!findResult.ok) return findResult;
     if (!findResult.value) return err(new NotFoundError('Transaction', id));

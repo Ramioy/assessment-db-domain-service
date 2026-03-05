@@ -1,5 +1,5 @@
 import type { Result } from '@shared/result';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 import { TransactionStatus } from '@domain/models/transaction-status.entity';
 
 export interface TransactionStatusRepositoryPort {

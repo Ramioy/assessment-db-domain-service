@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Product } from '@domain/models/product.entity';
-import { type DomainError } from '@domain/errors';
+import { type AppError } from '@domain/errors';
 import { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
 import { type Result } from '@shared/result';
 
@@ -12,7 +12,7 @@ export class FindAllProductsUseCase {
     private readonly repository: ProductRepositoryPort,
   ) {}
 
-  async execute(categoryId?: number): Promise<Result<Product[], DomainError>> {
+  async execute(categoryId?: number): Promise<Result<Product[], AppError>> {
     if (categoryId !== undefined) {
       return this.repository.findByCategoryId(categoryId);
     }

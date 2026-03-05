@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Customer, CreateCustomerDto } from '@domain/models/customer.entity';
-import { NotFoundError, AlreadyExistsError, type DomainError } from '@domain/errors';
+import { NotFoundError, AlreadyExistsError, type AppError } from '@domain/errors';
 import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
 import { CustomerDocumentTypeRepositoryPort } from '@application/ports/out/customer-document-type-repository.port';
 import { err, type Result } from '@shared/result';
@@ -15,7 +15,7 @@ export class CreateCustomerUseCase {
     private readonly documentTypeRepository: CustomerDocumentTypeRepositoryPort,
   ) {}
 
-  async execute(dto: CreateCustomerDto): Promise<Result<Customer, DomainError>> {
+  async execute(dto: CreateCustomerDto): Promise<Result<Customer, AppError>> {
     const docTypeResult = await this.documentTypeRepository.findById(dto.customerDocumentTypeId);
     if (!docTypeResult.ok) return docTypeResult;
     if (!docTypeResult.value) {

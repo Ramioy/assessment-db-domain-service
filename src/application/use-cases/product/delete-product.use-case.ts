@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
 import { ok, err, type Result } from '@shared/result';
 
@@ -11,7 +11,7 @@ export class DeleteProductUseCase {
     private readonly repository: ProductRepositoryPort,
   ) {}
 
-  async execute(id: number): Promise<Result<void, DomainError>> {
+  async execute(id: number): Promise<Result<void, AppError>> {
     const findResult = await this.repository.findById(id);
     if (!findResult.ok) return findResult;
     if (!findResult.value) return err(new NotFoundError('Product', id));

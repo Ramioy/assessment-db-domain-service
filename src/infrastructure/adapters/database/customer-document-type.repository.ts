@@ -6,7 +6,7 @@ import { CustomerDocumentTypeRepositoryPort } from '@application/ports/out/custo
 import { fromPromise, type Result } from '@shared/result';
 
 import { wrapDbError } from './base.repository';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 
 @Injectable()
 export class CustomerDocumentTypeRepository implements CustomerDocumentTypeRepositoryPort {

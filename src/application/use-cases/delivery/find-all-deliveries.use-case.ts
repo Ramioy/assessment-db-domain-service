@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Delivery } from '@domain/models/delivery.entity';
-import { type DomainError } from '@domain/errors';
+import { type AppError } from '@domain/errors';
 import { DeliveryRepositoryPort } from '@application/ports/out/delivery-repository.port';
 import { type Result } from '@shared/result';
 
@@ -15,7 +15,7 @@ export class FindAllDeliveriesUseCase {
   async execute(
     transactionId?: number,
     customerId?: number,
-  ): Promise<Result<Delivery[], DomainError>> {
+  ): Promise<Result<Delivery[], AppError>> {
     if (transactionId !== undefined) {
       return this.repository.findByTransactionId(transactionId);
     }

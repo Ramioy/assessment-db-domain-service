@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { ProductCategory, CreateProductCategoryDto } from '@domain/models/product-category.entity';
-import { AlreadyExistsError, type DomainError } from '@domain/errors';
+import { AlreadyExistsError, type AppError } from '@domain/errors';
 import { ProductCategoryRepositoryPort } from '@application/ports/out/product-category-repository.port';
 import { err, type Result } from '@shared/result';
 
@@ -12,7 +12,7 @@ export class CreateProductCategoryUseCase {
     private readonly repository: ProductCategoryRepositoryPort,
   ) {}
 
-  async execute(dto: CreateProductCategoryDto): Promise<Result<ProductCategory, DomainError>> {
+  async execute(dto: CreateProductCategoryDto): Promise<Result<ProductCategory, AppError>> {
     const existingResult = await this.repository.findByName(dto.name);
     if (!existingResult.ok) return existingResult;
     if (existingResult.value) {

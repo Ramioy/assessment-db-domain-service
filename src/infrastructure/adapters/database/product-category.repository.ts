@@ -6,7 +6,7 @@ import { ProductCategoryRepositoryPort } from '@application/ports/out/product-ca
 import { fromPromise, type Result } from '@shared/result';
 
 import { wrapDbError } from './base.repository';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 
 @Injectable()
 export class ProductCategoryRepository implements ProductCategoryRepositoryPort {

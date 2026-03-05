@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Customer } from '@domain/models/customer.entity';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
 import { ok, err, type Result } from '@shared/result';
 
@@ -12,7 +12,7 @@ export class FindCustomerUseCase {
     private readonly repository: CustomerRepositoryPort,
   ) {}
 
-  async execute(id: number): Promise<Result<Customer, DomainError>> {
+  async execute(id: number): Promise<Result<Customer, AppError>> {
     const result = await this.repository.findById(id);
     if (!result.ok) return result;
     if (!result.value) return err(new NotFoundError('Customer', id));

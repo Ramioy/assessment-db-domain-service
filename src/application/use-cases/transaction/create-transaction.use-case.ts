@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Transaction, CreateTransactionDto } from '@domain/models/transaction.entity';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { TransactionService } from '@domain/services/transaction.service';
 import { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
 import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
@@ -21,7 +21,7 @@ export class CreateTransactionUseCase {
     private readonly statusRepository: TransactionStatusRepositoryPort,
   ) {}
 
-  async execute(dto: CreateTransactionDto): Promise<Result<Transaction, DomainError>> {
+  async execute(dto: CreateTransactionDto): Promise<Result<Transaction, AppError>> {
     const validation = this.transactionService.validateTransactionCreation(
       dto.customerId,
       dto.transactionStatusId,

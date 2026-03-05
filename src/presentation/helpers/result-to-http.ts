@@ -6,16 +6,16 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { type Result } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
 import {
   NotFoundError,
   AlreadyExistsError,
   InsufficientStockError,
   InvalidTransactionError,
-  InfrastructureError,
-  type DomainError,
+  type AppError,
 } from '@domain/errors';
 
-export function unwrapResult<T>(result: Result<T, DomainError>): T {
+export function unwrapResult<T>(result: Result<T, AppError>): T {
   if (result.ok) return result.value;
 
   const { error } = result;

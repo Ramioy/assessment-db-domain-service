@@ -1,5 +1,5 @@
 import type { Result } from '@shared/result';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 import { Transaction } from '@domain/models/transaction.entity';
 
 export interface TransactionRepositoryPort {

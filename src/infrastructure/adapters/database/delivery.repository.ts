@@ -6,7 +6,7 @@ import { DeliveryRepositoryPort } from '@application/ports/out/delivery-reposito
 import { fromPromise, type Result } from '@shared/result';
 
 import { wrapDbError } from './base.repository';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 
 @Injectable()
 export class DeliveryRepository implements DeliveryRepositoryPort {

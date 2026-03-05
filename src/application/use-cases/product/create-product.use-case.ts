@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Product, CreateProductDto } from '@domain/models/product.entity';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
 import { ProductCategoryRepositoryPort } from '@application/ports/out/product-category-repository.port';
 import { err, type Result } from '@shared/result';
@@ -15,7 +15,7 @@ export class CreateProductUseCase {
     private readonly categoryRepository: ProductCategoryRepositoryPort,
   ) {}
 
-  async execute(dto: CreateProductDto): Promise<Result<Product, DomainError>> {
+  async execute(dto: CreateProductDto): Promise<Result<Product, AppError>> {
     const categoryResult = await this.categoryRepository.findById(dto.categoryId);
     if (!categoryResult.ok) return categoryResult;
     if (!categoryResult.value) {

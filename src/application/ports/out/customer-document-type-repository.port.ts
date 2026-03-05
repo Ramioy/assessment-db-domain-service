@@ -1,5 +1,5 @@
 import type { Result } from '@shared/result';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
 
 export interface CustomerDocumentTypeRepositoryPort {

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { Delivery, CreateDeliveryDto } from '@domain/models/delivery.entity';
-import { NotFoundError, type DomainError } from '@domain/errors';
+import { NotFoundError, type AppError } from '@domain/errors';
 import { DeliveryRepositoryPort } from '@application/ports/out/delivery-repository.port';
 import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
 import { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
@@ -18,7 +18,7 @@ export class CreateDeliveryUseCase {
     private readonly transactionRepository: TransactionRepositoryPort,
   ) {}
 
-  async execute(dto: CreateDeliveryDto): Promise<Result<Delivery, DomainError>> {
+  async execute(dto: CreateDeliveryDto): Promise<Result<Delivery, AppError>> {
     const customerResult = await this.customerRepository.findById(dto.customerId);
     if (!customerResult.ok) return customerResult;
     if (!customerResult.value) {

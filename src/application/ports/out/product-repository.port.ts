@@ -1,5 +1,5 @@
 import type { Result } from '@shared/result';
-import type { InfrastructureError } from '@domain/errors';
+import type { InfrastructureError } from '@shared/errors';
 import { Product } from '@domain/models/product.entity';
 
 export interface ProductRepositoryPort {
