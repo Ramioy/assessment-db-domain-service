@@ -25,7 +25,8 @@
     "^@application/(.*)$": "<rootDir>/src/application/$1",
     "^@infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
     "^@presentation/(.*)$": "<rootDir>/src/presentation/$1",
-    "^@shared/(.*)$": "<rootDir>/src/shared/$1"
+    "^@shared/(.*)$": "<rootDir>/src/shared/$1",
+    "^src/(.*)$": "<rootDir>/src/$1"
   },
   "testTimeout": 30000
 }
