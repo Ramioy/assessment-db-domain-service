@@ -5,6 +5,7 @@ import { FindProductCategoryUseCase } from '@application/use-cases/product-categ
 import { FindAllProductCategoriesUseCase } from '@application/use-cases/product-category/find-all-product-categories.use-case';
 import { UpdateProductCategoryUseCase } from '@application/use-cases/product-category/update-product-category.use-case';
 import { DeleteProductCategoryUseCase } from '@application/use-cases/product-category/delete-product-category.use-case';
+import { ok } from '@shared/result';
 import { makeProductCategory } from '../../../helpers/entity-factory';
 
 describe('ProductCategoryController', () => {
@@ -36,7 +37,7 @@ describe('ProductCategoryController', () => {
     it('calls createUseCase.execute with dto and returns result', async () => {
       const dto = { name: 'Electronics', description: null };
       const saved = makeProductCategory(dto);
-      mockCreate.execute.mockResolvedValue(saved);
+      mockCreate.execute.mockResolvedValue(ok(saved));
 
       const result = await controller.create(dto);
 
@@ -48,7 +49,7 @@ describe('ProductCategoryController', () => {
   describe('findAll', () => {
     it('calls findAllUseCase.execute and returns result', async () => {
       const cats = [makeProductCategory()];
-      mockFindAll.execute.mockResolvedValue(cats);
+      mockFindAll.execute.mockResolvedValue(ok(cats));
 
       const result = await controller.findAll();
 
@@ -60,7 +61,7 @@ describe('ProductCategoryController', () => {
   describe('findOne', () => {
     it('calls findUseCase.execute with id and returns result', async () => {
       const cat = makeProductCategory({ id: 1 });
-      mockFind.execute.mockResolvedValue(cat);
+      mockFind.execute.mockResolvedValue(ok(cat));
 
       const result = await controller.findOne(1);
 
@@ -73,7 +74,7 @@ describe('ProductCategoryController', () => {
     it('calls updateUseCase.execute with id and dto', async () => {
       const dto = { name: 'Updated' };
       const updated = makeProductCategory({ ...dto });
-      mockUpdate.execute.mockResolvedValue(updated);
+      mockUpdate.execute.mockResolvedValue(ok(updated));
 
       const result = await controller.update(1, dto);
 
@@ -84,7 +85,7 @@ describe('ProductCategoryController', () => {
 
   describe('remove', () => {
     it('calls deleteUseCase.execute with id', async () => {
-      mockDelete.execute.mockResolvedValue(undefined);
+      mockDelete.execute.mockResolvedValue(ok(undefined));
 
       await controller.remove(1);
 

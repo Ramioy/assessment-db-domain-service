@@ -5,6 +5,7 @@ import { FindCustomerUseCase } from '@application/use-cases/customer/find-custom
 import { FindAllCustomersUseCase } from '@application/use-cases/customer/find-all-customers.use-case';
 import { UpdateCustomerUseCase } from '@application/use-cases/customer/update-customer.use-case';
 import { DeleteCustomerUseCase } from '@application/use-cases/customer/delete-customer.use-case';
+import { ok } from '@shared/result';
 import { makeCustomer } from '../../../helpers/entity-factory';
 
 describe('CustomerController', () => {
@@ -34,9 +35,15 @@ describe('CustomerController', () => {
 
   describe('create', () => {
     it('delegates to createUseCase', async () => {
-      const dto = { customerDocumentTypeId: 1, documentNumber: '123', email: 'a@b.com', contactPhone: null, address: null };
+      const dto = {
+        customerDocumentTypeId: 1,
+        documentNumber: '123',
+        email: 'a@b.com',
+        contactPhone: null,
+        address: null,
+      };
       const saved = makeCustomer(dto);
-      mockCreate.execute.mockResolvedValue(saved);
+      mockCreate.execute.mockResolvedValue(ok(saved));
 
       const result = await controller.create(dto);
 
@@ -48,7 +55,7 @@ describe('CustomerController', () => {
   describe('findAll', () => {
     it('returns all customers', async () => {
       const customers = [makeCustomer()];
-      mockFindAll.execute.mockResolvedValue(customers);
+      mockFindAll.execute.mockResolvedValue(ok(customers));
 
       const result = await controller.findAll();
 
@@ -60,7 +67,7 @@ describe('CustomerController', () => {
   describe('findOne', () => {
     it('delegates to findUseCase with id', async () => {
       const customer = makeCustomer({ id: 1 });
-      mockFind.execute.mockResolvedValue(customer);
+      mockFind.execute.mockResolvedValue(ok(customer));
 
       const result = await controller.findOne(1);
 
@@ -73,7 +80,7 @@ describe('CustomerController', () => {
     it('delegates to updateUseCase', async () => {
       const dto = { address: 'New address' };
       const updated = makeCustomer({ address: 'New address' });
-      mockUpdate.execute.mockResolvedValue(updated);
+      mockUpdate.execute.mockResolvedValue(ok(updated));
 
       const result = await controller.update(1, dto);
 
@@ -84,7 +91,7 @@ describe('CustomerController', () => {
 
   describe('remove', () => {
     it('delegates to deleteUseCase', async () => {
-      mockDelete.execute.mockResolvedValue(undefined);
+      mockDelete.execute.mockResolvedValue(ok(undefined));
 
       await controller.remove(1);
 

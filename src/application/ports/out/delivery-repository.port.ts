@@ -1,11 +1,13 @@
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
 import { Delivery } from '@domain/models/delivery.entity';
 
 export interface IDeliveryRepository {
-  findById(id: number): Promise<Delivery | null>;
-  findByUuid(uuid: string): Promise<Delivery | null>;
-  findByTransactionId(transactionId: number): Promise<Delivery[]>;
-  findByCustomerId(customerId: number): Promise<Delivery[]>;
-  findAll(): Promise<Delivery[]>;
-  save(entity: Delivery): Promise<Delivery>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<Delivery | null, InfrastructureError>>;
+  findByUuid(uuid: string): Promise<Result<Delivery | null, InfrastructureError>>;
+  findByTransactionId(transactionId: number): Promise<Result<Delivery[], InfrastructureError>>;
+  findByCustomerId(customerId: number): Promise<Result<Delivery[], InfrastructureError>>;
+  findAll(): Promise<Result<Delivery[], InfrastructureError>>;
+  save(entity: Delivery): Promise<Result<Delivery, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

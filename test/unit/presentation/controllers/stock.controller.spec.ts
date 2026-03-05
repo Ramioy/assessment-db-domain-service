@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StockController } from '@presentation/controllers/stock.controller';
 import { FindStockByProductUseCase } from '@application/use-cases/stock/find-stock-by-product.use-case';
 import { UpdateStockUseCase } from '@application/use-cases/stock/update-stock.use-case';
+import { ok } from '@shared/result';
 import { makeStock } from '../../../helpers/entity-factory';
 
 describe('StockController', () => {
@@ -26,7 +27,7 @@ describe('StockController', () => {
   describe('findByProduct', () => {
     it('delegates to findByProductUseCase', async () => {
       const stock = makeStock({ productId: 3 });
-      mockFindByProduct.execute.mockResolvedValue(stock);
+      mockFindByProduct.execute.mockResolvedValue(ok(stock));
 
       const result = await controller.findByProduct(3);
 
@@ -39,7 +40,7 @@ describe('StockController', () => {
     it('delegates to updateUseCase with productId and dto', async () => {
       const dto = { quantity: 100 };
       const updated = makeStock({ productId: 3, quantity: 100 });
-      mockUpdate.execute.mockResolvedValue(updated);
+      mockUpdate.execute.mockResolvedValue(ok(updated));
 
       const result = await controller.update(3, dto);
 

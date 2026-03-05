@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Customer, CreateCustomerDto } from '@domain/models/customer.entity';
-import { AlreadyExistsException } from '@domain/exceptions/already-exists.exception';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, AlreadyExistsError, type DomainError } from '@domain/errors';
 import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
 import { ICustomerDocumentTypeRepository } from '@application/ports/out/customer-document-type-repository.port';
+import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class CreateCustomerUseCase {
@@ -14,19 +14,25 @@ export class CreateCustomerUseCase {
     private readonly documentTypeRepository: ICustomerDocumentTypeRepository,
   ) {}
 
-  async execute(dto: CreateCustomerDto): Promise<Customer> {
-    const docType = await this.documentTypeRepository.findById(dto.customerDocumentTypeId);
-    if (!docType) {
-      throw new NotFoundException('CustomerDocumentType', dto.customerDocumentTypeId);
+  async execute(dto: CreateCustomerDto): Promise<Result<Customer, DomainError>> {
+    const docTypeResult = await this.documentTypeRepository.findById(dto.customerDocumentTypeId);
+    if (!docTypeResult.ok) return docTypeResult;
+    if (!docTypeResult.value) {
+      return err(new NotFoundError('CustomerDocumentType', dto.customerDocumentTypeId));
     }
-    const existingByEmail = await this.customerRepository.findByEmail(dto.email);
-    if (existingByEmail) {
-      throw new AlreadyExistsException('Customer', 'email', dto.email);
+
+    const emailResult = await this.customerRepository.findByEmail(dto.email);
+    if (!emailResult.ok) return emailResult;
+    if (emailResult.value) {
+      return err(new AlreadyExistsError('Customer', 'email', dto.email));
     }
-    const existingByDoc = await this.customerRepository.findByDocumentNumber(dto.documentNumber);
-    if (existingByDoc) {
-      throw new AlreadyExistsException('Customer', 'documentNumber', dto.documentNumber);
+
+    const docResult = await this.customerRepository.findByDocumentNumber(dto.documentNumber);
+    if (!docResult.ok) return docResult;
+    if (docResult.value) {
+      return err(new AlreadyExistsError('Customer', 'documentNumber', dto.documentNumber));
     }
+
     const entity = Object.assign(new Customer(), dto);
     return this.customerRepository.save(entity);
   }

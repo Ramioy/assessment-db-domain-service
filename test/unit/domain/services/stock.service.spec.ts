@@ -1,5 +1,5 @@
 import { StockService } from '@domain/services/stock.service';
-import { InsufficientStockException } from '@domain/exceptions/insufficient-stock.exception';
+import { InsufficientStockError } from '@domain/errors';
 import { makeStock } from '../../../helpers/entity-factory';
 
 describe('StockService', () => {
@@ -10,47 +10,48 @@ describe('StockService', () => {
   });
 
   describe('validateStockAvailability', () => {
-    it('does not throw when stock is sufficient', () => {
+    it('returns ok when stock is sufficient', () => {
       const stock = makeStock({ quantity: 10 });
-      expect(() => service.validateStockAvailability(stock, 5)).not.toThrow();
+      const result = service.validateStockAvailability(stock, 5);
+      expect(result.ok).toBe(true);
     });
 
-    it('does not throw when requested equals available', () => {
+    it('returns ok when requested equals available', () => {
       const stock = makeStock({ quantity: 5 });
-      expect(() => service.validateStockAvailability(stock, 5)).not.toThrow();
+      const result = service.validateStockAvailability(stock, 5);
+      expect(result.ok).toBe(true);
     });
 
-    it('throws Error when requestedQty is zero', () => {
+    it('returns InsufficientStockError when requestedQty is zero', () => {
       const stock = makeStock({ quantity: 10 });
-      expect(() => service.validateStockAvailability(stock, 0)).toThrow(
-        'Requested quantity must be greater than zero',
-      );
+      const result = service.validateStockAvailability(stock, 0);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(InsufficientStockError);
     });
 
-    it('throws Error when requestedQty is negative', () => {
+    it('returns InsufficientStockError when requestedQty is negative', () => {
       const stock = makeStock({ quantity: 10 });
-      expect(() => service.validateStockAvailability(stock, -3)).toThrow(
-        'Requested quantity must be greater than zero',
-      );
+      const result = service.validateStockAvailability(stock, -3);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(InsufficientStockError);
     });
 
-    it('throws InsufficientStockException when stock is insufficient', () => {
+    it('returns InsufficientStockError when stock is insufficient', () => {
       const stock = makeStock({ productId: 7, quantity: 2 });
-      expect(() => service.validateStockAvailability(stock, 5)).toThrow(
-        InsufficientStockException,
-      );
+      const result = service.validateStockAvailability(stock, 5);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(InsufficientStockError);
     });
 
-    it('throws InsufficientStockException with correct details', () => {
+    it('returns InsufficientStockError with correct details', () => {
       const stock = makeStock({ productId: 7, quantity: 2 });
-      try {
-        service.validateStockAvailability(stock, 5);
-        fail('should have thrown');
-      } catch (e) {
-        expect(e).toBeInstanceOf(InsufficientStockException);
-        expect((e as Error).message).toContain('product 7');
-        expect((e as Error).message).toContain('requested 5');
-        expect((e as Error).message).toContain('available 2');
+      const result = service.validateStockAvailability(stock, 5);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBeInstanceOf(InsufficientStockError);
+        expect(result.error.message).toContain('product 7');
+        expect(result.error.message).toContain('requested 5');
+        expect(result.error.message).toContain('available 2');
       }
     });
   });
@@ -58,34 +59,37 @@ describe('StockService', () => {
   describe('decrementStock', () => {
     it('decrements quantity by the given amount', () => {
       const stock = makeStock({ quantity: 10 });
-      const updated = service.decrementStock(stock, 3);
-      expect(updated.quantity).toBe(7);
+      const result = service.decrementStock(stock, 3);
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value.quantity).toBe(7);
     });
 
     it('returns the same stock object (mutated in-place)', () => {
       const stock = makeStock({ quantity: 10 });
       const result = service.decrementStock(stock, 4);
-      expect(result).toBe(stock);
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value).toBe(stock);
     });
 
     it('allows decrement to zero', () => {
       const stock = makeStock({ quantity: 5 });
-      const updated = service.decrementStock(stock, 5);
-      expect(updated.quantity).toBe(0);
+      const result = service.decrementStock(stock, 5);
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value.quantity).toBe(0);
     });
 
-    it('throws when requested qty exceeds stock', () => {
+    it('returns error when requested qty exceeds stock', () => {
       const stock = makeStock({ quantity: 3 });
-      expect(() => service.decrementStock(stock, 10)).toThrow(
-        InsufficientStockException,
-      );
+      const result = service.decrementStock(stock, 10);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(InsufficientStockError);
     });
 
-    it('throws when qty is zero', () => {
+    it('returns error when qty is zero', () => {
       const stock = makeStock({ quantity: 10 });
-      expect(() => service.decrementStock(stock, 0)).toThrow(
-        'Requested quantity must be greater than zero',
-      );
+      const result = service.decrementStock(stock, 0);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(InsufficientStockError);
     });
   });
 });

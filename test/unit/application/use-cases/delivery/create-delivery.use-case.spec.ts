@@ -1,5 +1,6 @@
 import { CreateDeliveryUseCase } from '@application/use-cases/delivery/create-delivery.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import {
   makeMockDeliveryRepository,
   makeMockCustomerRepository,
@@ -23,44 +24,57 @@ describe('CreateDeliveryUseCase', () => {
   });
 
   it('creates and returns a delivery when all validations pass', async () => {
-    customerRepo.findById.mockResolvedValue(makeCustomer({ id: 1 }));
-    transactionRepo.findById.mockResolvedValue(makeTransaction({ id: 1 }));
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer({ id: 1 })));
+    transactionRepo.findById.mockResolvedValue(ok(makeTransaction({ id: 1 })));
     const saved = makeDelivery(dto);
-    deliveryRepo.save.mockResolvedValue(saved);
+    deliveryRepo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(dto);
 
     expect(customerRepo.findById).toHaveBeenCalledWith(1);
     expect(transactionRepo.findById).toHaveBeenCalledWith(1);
     expect(deliveryRepo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
-  it('throws NotFoundException when customer does not exist', async () => {
-    customerRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when customer does not exist', async () => {
+    customerRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(deliveryRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws NotFoundException when transaction does not exist', async () => {
-    customerRepo.findById.mockResolvedValue(makeCustomer());
-    transactionRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when transaction does not exist', async () => {
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer()));
+    transactionRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(deliveryRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws with correct message for missing customer', async () => {
-    customerRepo.findById.mockResolvedValue(null);
+  it('returns error with correct message for missing customer', async () => {
+    customerRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow('Customer with id 1 not found');
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('Customer with id 1 not found');
   });
 
-  it('throws with correct message for missing transaction', async () => {
-    customerRepo.findById.mockResolvedValue(makeCustomer());
-    transactionRepo.findById.mockResolvedValue(null);
+  it('returns error with correct message for missing transaction', async () => {
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer()));
+    transactionRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow('Transaction with id 1 not found');
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('Transaction with id 1 not found');
   });
 });

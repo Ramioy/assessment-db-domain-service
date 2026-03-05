@@ -1,9 +1,11 @@
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
 import { ProductCategory } from '@domain/models/product-category.entity';
 
 export interface IProductCategoryRepository {
-  findById(id: number): Promise<ProductCategory | null>;
-  findAll(): Promise<ProductCategory[]>;
-  findByName(name: string): Promise<ProductCategory | null>;
-  save(entity: ProductCategory): Promise<ProductCategory>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<ProductCategory | null, InfrastructureError>>;
+  findAll(): Promise<Result<ProductCategory[], InfrastructureError>>;
+  findByName(name: string): Promise<Result<ProductCategory | null, InfrastructureError>>;
+  save(entity: ProductCategory): Promise<Result<ProductCategory, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

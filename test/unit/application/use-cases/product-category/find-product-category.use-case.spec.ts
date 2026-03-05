@@ -1,5 +1,6 @@
 import { FindProductCategoryUseCase } from '@application/use-cases/product-category/find-product-category.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import { makeMockProductCategoryRepository } from '../../../../helpers/mock-repositories';
 import { makeProductCategory } from '../../../../helpers/entity-factory';
 
@@ -14,25 +15,30 @@ describe('FindProductCategoryUseCase', () => {
 
   it('returns the category when it exists', async () => {
     const category = makeProductCategory({ id: 1 });
-    repo.findById.mockResolvedValue(category);
+    repo.findById.mockResolvedValue(ok(category));
 
     const result = await useCase.execute(1);
 
     expect(repo.findById).toHaveBeenCalledWith(1);
-    expect(result).toBe(category);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(category);
   });
 
-  it('throws NotFoundException when category does not exist', async () => {
-    repo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when category does not exist', async () => {
+    repo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
   });
 
-  it('throws NotFoundException with correct message', async () => {
-    repo.findById.mockResolvedValue(null);
+  it('returns NotFoundError with correct message', async () => {
+    repo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99)).rejects.toThrow(
-      'ProductCategory with id 99 not found',
-    );
+    const result = await useCase.execute(99);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('ProductCategory with id 99 not found');
   });
 });

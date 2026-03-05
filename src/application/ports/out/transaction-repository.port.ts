@@ -1,9 +1,11 @@
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
 import { Transaction } from '@domain/models/transaction.entity';
 
 export interface ITransactionRepository {
-  findById(id: number): Promise<Transaction | null>;
-  findByCustomerId(customerId: number): Promise<Transaction[]>;
-  findAll(): Promise<Transaction[]>;
-  save(entity: Transaction): Promise<Transaction>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<Transaction | null, InfrastructureError>>;
+  findByCustomerId(customerId: number): Promise<Result<Transaction[], InfrastructureError>>;
+  findAll(): Promise<Result<Transaction[], InfrastructureError>>;
+  save(entity: Transaction): Promise<Result<Transaction, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

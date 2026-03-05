@@ -4,6 +4,7 @@ import { CreateTransactionUseCase } from '@application/use-cases/transaction/cre
 import { FindTransactionUseCase } from '@application/use-cases/transaction/find-transaction.use-case';
 import { FindAllTransactionsUseCase } from '@application/use-cases/transaction/find-all-transactions.use-case';
 import { UpdateTransactionUseCase } from '@application/use-cases/transaction/update-transaction.use-case';
+import { ok } from '@shared/result';
 import { makeTransaction } from '../../../helpers/entity-factory';
 
 describe('TransactionController', () => {
@@ -33,7 +34,7 @@ describe('TransactionController', () => {
     it('delegates to createUseCase', async () => {
       const dto = { customerId: 1, transactionStatusId: 1, cut: null };
       const saved = makeTransaction(dto);
-      mockCreate.execute.mockResolvedValue(saved);
+      mockCreate.execute.mockResolvedValue(ok(saved));
 
       const result = await controller.create(dto);
 
@@ -45,7 +46,7 @@ describe('TransactionController', () => {
   describe('findAll', () => {
     it('returns all transactions when no customerId given', async () => {
       const txs = [makeTransaction()];
-      mockFindAll.execute.mockResolvedValue(txs);
+      mockFindAll.execute.mockResolvedValue(ok(txs));
 
       const result = await controller.findAll(undefined);
 
@@ -55,7 +56,7 @@ describe('TransactionController', () => {
 
     it('parses customerId string to number', async () => {
       const txs = [makeTransaction({ customerId: 5 })];
-      mockFindAll.execute.mockResolvedValue(txs);
+      mockFindAll.execute.mockResolvedValue(ok(txs));
 
       const result = await controller.findAll('5');
 
@@ -67,7 +68,7 @@ describe('TransactionController', () => {
   describe('findOne', () => {
     it('delegates to findUseCase', async () => {
       const tx = makeTransaction({ id: 1 });
-      mockFind.execute.mockResolvedValue(tx);
+      mockFind.execute.mockResolvedValue(ok(tx));
 
       const result = await controller.findOne(1);
 
@@ -80,7 +81,7 @@ describe('TransactionController', () => {
     it('delegates to updateUseCase', async () => {
       const dto = { transactionStatusId: 2 };
       const updated = makeTransaction({ transactionStatusId: 2 });
-      mockUpdate.execute.mockResolvedValue(updated);
+      mockUpdate.execute.mockResolvedValue(ok(updated));
 
       const result = await controller.update(1, dto);
 

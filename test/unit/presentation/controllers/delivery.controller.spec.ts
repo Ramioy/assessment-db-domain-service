@@ -3,6 +3,7 @@ import { DeliveryController } from '@presentation/controllers/delivery.controlle
 import { CreateDeliveryUseCase } from '@application/use-cases/delivery/create-delivery.use-case';
 import { FindDeliveryUseCase } from '@application/use-cases/delivery/find-delivery.use-case';
 import { FindAllDeliveriesUseCase } from '@application/use-cases/delivery/find-all-deliveries.use-case';
+import { ok } from '@shared/result';
 import { makeDelivery } from '../../../helpers/entity-factory';
 
 describe('DeliveryController', () => {
@@ -30,7 +31,7 @@ describe('DeliveryController', () => {
     it('delegates to createUseCase', async () => {
       const dto = { customerId: 1, transactionId: 1, customerAddressId: null };
       const saved = makeDelivery(dto);
-      mockCreate.execute.mockResolvedValue(saved);
+      mockCreate.execute.mockResolvedValue(ok(saved));
 
       const result = await controller.create(dto);
 
@@ -42,7 +43,7 @@ describe('DeliveryController', () => {
   describe('findAll', () => {
     it('returns all deliveries when no filters given', async () => {
       const deliveries = [makeDelivery()];
-      mockFindAll.execute.mockResolvedValue(deliveries);
+      mockFindAll.execute.mockResolvedValue(ok(deliveries));
 
       const result = await controller.findAll(undefined, undefined);
 
@@ -51,7 +52,7 @@ describe('DeliveryController', () => {
     });
 
     it('parses transactionId string to number', async () => {
-      mockFindAll.execute.mockResolvedValue([]);
+      mockFindAll.execute.mockResolvedValue(ok([]));
 
       await controller.findAll('10', undefined);
 
@@ -59,7 +60,7 @@ describe('DeliveryController', () => {
     });
 
     it('parses customerId string to number', async () => {
-      mockFindAll.execute.mockResolvedValue([]);
+      mockFindAll.execute.mockResolvedValue(ok([]));
 
       await controller.findAll(undefined, '3');
 
@@ -67,7 +68,7 @@ describe('DeliveryController', () => {
     });
 
     it('parses both filters when both are provided', async () => {
-      mockFindAll.execute.mockResolvedValue([]);
+      mockFindAll.execute.mockResolvedValue(ok([]));
 
       await controller.findAll('5', '2');
 
@@ -78,7 +79,7 @@ describe('DeliveryController', () => {
   describe('findOne', () => {
     it('delegates to findUseCase with id', async () => {
       const delivery = makeDelivery({ id: 1 });
-      mockFind.execute.mockResolvedValue(delivery);
+      mockFind.execute.mockResolvedValue(ok(delivery));
 
       const result = await controller.findOne(1);
 

@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Stock } from '@domain/models/stock.entity';
+import { InfrastructureError } from '@domain/errors';
 import { IStockRepository } from '@application/ports/out/stock-repository.port';
+import { fromPromise, type Result } from '@shared/result';
+
+const wrap = (e: unknown) => new InfrastructureError('DB_QUERY_FAILED', e);
 
 @Injectable()
 export class StockRepository implements IStockRepository {
@@ -11,24 +15,26 @@ export class StockRepository implements IStockRepository {
     private readonly repo: Repository<Stock>,
   ) {}
 
-  findById(id: number): Promise<Stock | null> {
-    return this.repo.findOne({ where: { id } });
+  findById(id: number): Promise<Result<Stock | null, InfrastructureError>> {
+    return fromPromise(this.repo.findOne({ where: { id } }), wrap);
   }
 
-  findByProductId(productId: number): Promise<Stock | null> {
-    return this.repo.findOne({ where: { productId } });
+  findByProductId(productId: number): Promise<Result<Stock | null, InfrastructureError>> {
+    return fromPromise(this.repo.findOne({ where: { productId } }), wrap);
   }
 
-  findAll(): Promise<Stock[]> {
-    return this.repo.find();
+  findAll(): Promise<Result<Stock[], InfrastructureError>> {
+    return fromPromise(this.repo.find(), wrap);
   }
 
-  save(entity: Stock): Promise<Stock> {
-    return this.repo.save(entity);
+  save(entity: Stock): Promise<Result<Stock, InfrastructureError>> {
+    return fromPromise(this.repo.save(entity), wrap);
   }
 
-  async delete(id: number): Promise<boolean> {
-    const result = await this.repo.delete(id);
-    return (result.affected ?? 0) > 0;
+  async delete(id: number): Promise<Result<boolean, InfrastructureError>> {
+    return fromPromise(
+      this.repo.delete(id).then((r) => (r.affected ?? 0) > 0),
+      wrap,
+    );
   }
 }

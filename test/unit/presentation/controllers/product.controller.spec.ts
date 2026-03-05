@@ -5,6 +5,7 @@ import { FindProductUseCase } from '@application/use-cases/product/find-product.
 import { FindAllProductsUseCase } from '@application/use-cases/product/find-all-products.use-case';
 import { UpdateProductUseCase } from '@application/use-cases/product/update-product.use-case';
 import { DeleteProductUseCase } from '@application/use-cases/product/delete-product.use-case';
+import { ok } from '@shared/result';
 import { makeProduct } from '../../../helpers/entity-factory';
 
 describe('ProductController', () => {
@@ -36,7 +37,7 @@ describe('ProductController', () => {
     it('delegates to createUseCase', async () => {
       const dto = { name: 'Laptop', categoryId: 1, description: null, imageUrl: null };
       const saved = makeProduct(dto);
-      mockCreate.execute.mockResolvedValue(saved);
+      mockCreate.execute.mockResolvedValue(ok(saved));
 
       const result = await controller.create(dto);
 
@@ -48,7 +49,7 @@ describe('ProductController', () => {
   describe('findAll', () => {
     it('calls findAll without categoryId filter', async () => {
       const products = [makeProduct()];
-      mockFindAll.execute.mockResolvedValue(products);
+      mockFindAll.execute.mockResolvedValue(ok(products));
 
       const result = await controller.findAll(undefined);
 
@@ -58,7 +59,7 @@ describe('ProductController', () => {
 
     it('parses categoryId string to number and filters', async () => {
       const products = [makeProduct({ categoryId: 2 })];
-      mockFindAll.execute.mockResolvedValue(products);
+      mockFindAll.execute.mockResolvedValue(ok(products));
 
       const result = await controller.findAll('2');
 
@@ -70,7 +71,7 @@ describe('ProductController', () => {
   describe('findOne', () => {
     it('delegates to findUseCase', async () => {
       const product = makeProduct({ id: 1 });
-      mockFind.execute.mockResolvedValue(product);
+      mockFind.execute.mockResolvedValue(ok(product));
 
       const result = await controller.findOne(1);
 
@@ -83,7 +84,7 @@ describe('ProductController', () => {
     it('delegates to updateUseCase', async () => {
       const dto = { name: 'Updated' };
       const updated = makeProduct({ name: 'Updated' });
-      mockUpdate.execute.mockResolvedValue(updated);
+      mockUpdate.execute.mockResolvedValue(ok(updated));
 
       const result = await controller.update(1, dto);
 
@@ -94,7 +95,7 @@ describe('ProductController', () => {
 
   describe('remove', () => {
     it('delegates to deleteUseCase', async () => {
-      mockDelete.execute.mockResolvedValue(undefined);
+      mockDelete.execute.mockResolvedValue(ok(undefined));
 
       await controller.remove(1);
 

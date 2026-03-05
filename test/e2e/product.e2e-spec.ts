@@ -30,7 +30,11 @@ describe('ProductController (e2e)', () => {
     });
 
     it('returns 400 when name is missing', async () => {
-      const response = await app.inject({ method: 'POST', url: '/products', payload: { categoryId: 1 } });
+      const response = await app.inject({
+        method: 'POST',
+        url: '/products',
+        payload: { categoryId: 1 },
+      });
 
       expect(response.statusCode).toBe(400);
     });

@@ -1,8 +1,10 @@
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
 
 export interface ICustomerDocumentTypeRepository {
-  findById(id: number): Promise<CustomerDocumentType | null>;
-  findAll(): Promise<CustomerDocumentType[]>;
-  save(entity: CustomerDocumentType): Promise<CustomerDocumentType>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<CustomerDocumentType | null, InfrastructureError>>;
+  findAll(): Promise<Result<CustomerDocumentType[], InfrastructureError>>;
+  save(entity: CustomerDocumentType): Promise<Result<CustomerDocumentType, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

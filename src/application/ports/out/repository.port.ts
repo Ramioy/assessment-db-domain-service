@@ -1,11 +1,9 @@
-/**
- * Repository Port (Driven Port)
- * Interface that defines repository contracts
- * Implemented by the infrastructure layer
- */
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
+
 export interface IRepository<T> {
-  findById(id: number): Promise<T | null>;
-  findAll(): Promise<T[]>;
-  save(entity: T): Promise<T>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<T | null, InfrastructureError>>;
+  findAll(): Promise<Result<T[], InfrastructureError>>;
+  save(entity: T): Promise<Result<T, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

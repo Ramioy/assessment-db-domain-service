@@ -7,14 +7,8 @@ import {
   createProductCategorySchema,
   updateProductCategorySchema,
 } from '@domain/models/product-category.entity';
-import {
-  createProductSchema,
-  updateProductSchema,
-} from '@domain/models/product.entity';
-import {
-  createStockSchema,
-  updateStockSchema,
-} from '@domain/models/stock.entity';
+import { createProductSchema, updateProductSchema } from '@domain/models/product.entity';
+import { createStockSchema, updateStockSchema } from '@domain/models/stock.entity';
 import { createCustomerSchema } from '@domain/models/customer.entity';
 import {
   createTransactionSchema,
@@ -24,12 +18,18 @@ import { createDeliverySchema } from '@domain/models/delivery.entity';
 
 // ── Helpers ───────────────────────────────────────────────────
 
-function expectValid<T>(schema: { safeParse: (v: unknown) => { success: boolean; data?: T } }, value: unknown) {
+function expectValid<T>(
+  schema: { safeParse: (v: unknown) => { success: boolean; data?: T } },
+  value: unknown,
+) {
   const result = schema.safeParse(value);
   expect(result.success).toBe(true);
 }
 
-function expectInvalid(schema: { safeParse: (v: unknown) => { success: boolean } }, value: unknown) {
+function expectInvalid(
+  schema: { safeParse: (v: unknown) => { success: boolean } },
+  value: unknown,
+) {
   const result = schema.safeParse(value);
   expect(result.success).toBe(false);
 }

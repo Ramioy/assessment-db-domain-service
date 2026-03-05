@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ProductCategory, UpdateProductCategoryDto } from '@domain/models/product-category.entity';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
+import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class UpdateProductCategoryUseCase {
@@ -10,12 +11,15 @@ export class UpdateProductCategoryUseCase {
     private readonly repository: IProductCategoryRepository,
   ) {}
 
-  async execute(id: number, dto: UpdateProductCategoryDto): Promise<ProductCategory> {
-    const entity = await this.repository.findById(id);
-    if (!entity) {
-      throw new NotFoundException('ProductCategory', id);
-    }
-    Object.assign(entity, dto);
-    return this.repository.save(entity);
+  async execute(
+    id: number,
+    dto: UpdateProductCategoryDto,
+  ): Promise<Result<ProductCategory, DomainError>> {
+    const findResult = await this.repository.findById(id);
+    if (!findResult.ok) return findResult;
+    if (!findResult.value) return err(new NotFoundError('ProductCategory', id));
+
+    Object.assign(findResult.value, dto);
+    return this.repository.save(findResult.value);
   }
 }

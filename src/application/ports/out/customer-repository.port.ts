@@ -1,10 +1,14 @@
+import type { Result } from '@shared/result';
+import type { InfrastructureError } from '@domain/errors';
 import { Customer } from '@domain/models/customer.entity';
 
 export interface ICustomerRepository {
-  findById(id: number): Promise<Customer | null>;
-  findByEmail(email: string): Promise<Customer | null>;
-  findByDocumentNumber(documentNumber: string): Promise<Customer | null>;
-  findAll(): Promise<Customer[]>;
-  save(entity: Customer): Promise<Customer>;
-  delete(id: number): Promise<boolean>;
+  findById(id: number): Promise<Result<Customer | null, InfrastructureError>>;
+  findByEmail(email: string): Promise<Result<Customer | null, InfrastructureError>>;
+  findByDocumentNumber(
+    documentNumber: string,
+  ): Promise<Result<Customer | null, InfrastructureError>>;
+  findAll(): Promise<Result<Customer[], InfrastructureError>>;
+  save(entity: Customer): Promise<Result<Customer, InfrastructureError>>;
+  delete(id: number): Promise<Result<boolean, InfrastructureError>>;
 }

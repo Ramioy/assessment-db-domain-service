@@ -16,5 +16,9 @@ export const databaseConfig = (config: ConfigService): TypeOrmModuleOptions => (
   entities: [...ALL_ENTITIES],
   synchronize: config.get<boolean>('DB_SYNCHRONIZE', false),
   logging: config.get<boolean>('DB_LOGGING', false),
-  ssl: config.get<boolean>('DB_SSL', false) ? { rejectUnauthorized: false } : false,
+  ssl: config.get<boolean>('DB_SSL', false)
+    ? {
+        rejectUnauthorized: config.get<string>('NODE_ENV') === 'production',
+      }
+    : false,
 });

@@ -63,7 +63,10 @@ describe('ProductCategoryController (e2e)', () => {
 
   describe('GET /product-categories', () => {
     it('returns 200 with array of categories', async () => {
-      const categories = [makeProductCategory({ id: 1 }), makeProductCategory({ id: 2, name: 'Clothing' })];
+      const categories = [
+        makeProductCategory({ id: 1 }),
+        makeProductCategory({ id: 2, name: 'Clothing' }),
+      ];
       repos.productCategory.findAll.mockResolvedValue(categories);
 
       const response = await app.inject({ method: 'GET', url: '/product-categories' });
@@ -110,7 +113,9 @@ describe('ProductCategoryController (e2e)', () => {
       const existing = makeProductCategory({ id: 1 });
       const dto = { name: 'Updated Electronics' };
       repos.productCategory.findById.mockResolvedValue(existing);
-      repos.productCategory.save.mockResolvedValue(makeProductCategory({ id: 1, name: 'Updated Electronics' }));
+      repos.productCategory.save.mockResolvedValue(
+        makeProductCategory({ id: 1, name: 'Updated Electronics' }),
+      );
 
       const response = await app.inject({
         method: 'PATCH',

@@ -106,7 +106,10 @@ export async function bootstrapTestApp(): Promise<{
       { provide: DI_TOKENS.PRODUCT_CATEGORY_REPOSITORY, useValue: repos.productCategory },
       { provide: DI_TOKENS.PRODUCT_REPOSITORY, useValue: repos.product },
       { provide: DI_TOKENS.STOCK_REPOSITORY, useValue: repos.stock },
-      { provide: DI_TOKENS.CUSTOMER_DOCUMENT_TYPE_REPOSITORY, useValue: repos.customerDocumentType },
+      {
+        provide: DI_TOKENS.CUSTOMER_DOCUMENT_TYPE_REPOSITORY,
+        useValue: repos.customerDocumentType,
+      },
       { provide: DI_TOKENS.CUSTOMER_REPOSITORY, useValue: repos.customer },
       { provide: DI_TOKENS.TRANSACTION_STATUS_REPOSITORY, useValue: repos.transactionStatus },
       { provide: DI_TOKENS.TRANSACTION_REPOSITORY, useValue: repos.transaction },
@@ -141,9 +144,7 @@ export async function bootstrapTestApp(): Promise<{
     ],
   }).compile();
 
-  const app = moduleFixture.createNestApplication<NestFastifyApplication>(
-    new FastifyAdapter(),
-  );
+  const app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
   app.useGlobalFilters(new HttpErrorFilter());
 

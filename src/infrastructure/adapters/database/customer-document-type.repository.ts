@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
+import { InfrastructureError } from '@domain/errors';
 import { ICustomerDocumentTypeRepository } from '@application/ports/out/customer-document-type-repository.port';
+import { fromPromise, type Result } from '@shared/result';
+
+const wrap = (e: unknown) => new InfrastructureError('DB_QUERY_FAILED', e);
 
 @Injectable()
 export class CustomerDocumentTypeRepository implements ICustomerDocumentTypeRepository {
@@ -11,20 +15,22 @@ export class CustomerDocumentTypeRepository implements ICustomerDocumentTypeRepo
     private readonly repo: Repository<CustomerDocumentType>,
   ) {}
 
-  findById(id: number): Promise<CustomerDocumentType | null> {
-    return this.repo.findOne({ where: { id } });
+  findById(id: number): Promise<Result<CustomerDocumentType | null, InfrastructureError>> {
+    return fromPromise(this.repo.findOne({ where: { id } }), wrap);
   }
 
-  findAll(): Promise<CustomerDocumentType[]> {
-    return this.repo.find();
+  findAll(): Promise<Result<CustomerDocumentType[], InfrastructureError>> {
+    return fromPromise(this.repo.find(), wrap);
   }
 
-  save(entity: CustomerDocumentType): Promise<CustomerDocumentType> {
-    return this.repo.save(entity);
+  save(entity: CustomerDocumentType): Promise<Result<CustomerDocumentType, InfrastructureError>> {
+    return fromPromise(this.repo.save(entity), wrap);
   }
 
-  async delete(id: number): Promise<boolean> {
-    const result = await this.repo.delete(id);
-    return (result.affected ?? 0) > 0;
+  async delete(id: number): Promise<Result<boolean, InfrastructureError>> {
+    return fromPromise(
+      this.repo.delete(id).then((r) => (r.affected ?? 0) > 0),
+      wrap,
+    );
   }
 }

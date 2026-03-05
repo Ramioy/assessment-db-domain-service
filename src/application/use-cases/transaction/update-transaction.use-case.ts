@@ -1,8 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Transaction, UpdateTransactionDto } from '@domain/models/transaction.entity';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { ITransactionRepository } from '@application/ports/out/transaction-repository.port';
 import { ITransactionStatusRepository } from '@application/ports/out/transaction-status-repository.port';
+import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class UpdateTransactionUseCase {
@@ -13,18 +14,20 @@ export class UpdateTransactionUseCase {
     private readonly statusRepository: ITransactionStatusRepository,
   ) {}
 
-  async execute(id: number, dto: UpdateTransactionDto): Promise<Transaction> {
-    const entity = await this.transactionRepository.findById(id);
-    if (!entity) {
-      throw new NotFoundException('Transaction', id);
-    }
+  async execute(id: number, dto: UpdateTransactionDto): Promise<Result<Transaction, DomainError>> {
+    const findResult = await this.transactionRepository.findById(id);
+    if (!findResult.ok) return findResult;
+    if (!findResult.value) return err(new NotFoundError('Transaction', id));
+
     if (dto.transactionStatusId !== undefined) {
-      const status = await this.statusRepository.findById(dto.transactionStatusId);
-      if (!status) {
-        throw new NotFoundException('TransactionStatus', dto.transactionStatusId);
+      const statusResult = await this.statusRepository.findById(dto.transactionStatusId);
+      if (!statusResult.ok) return statusResult;
+      if (!statusResult.value) {
+        return err(new NotFoundError('TransactionStatus', dto.transactionStatusId));
       }
     }
-    Object.assign(entity, dto);
-    return this.transactionRepository.save(entity);
+
+    Object.assign(findResult.value, dto);
+    return this.transactionRepository.save(findResult.value);
   }
 }

@@ -1,6 +1,10 @@
 import { CreateProductUseCase } from '@application/use-cases/product/create-product.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
-import { makeMockProductRepository, makeMockProductCategoryRepository } from '../../../../helpers/mock-repositories';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
+import {
+  makeMockProductRepository,
+  makeMockProductCategoryRepository,
+} from '../../../../helpers/mock-repositories';
 import { makeProduct, makeProductCategory } from '../../../../helpers/entity-factory';
 
 describe('CreateProductUseCase', () => {
@@ -17,29 +21,34 @@ describe('CreateProductUseCase', () => {
   const dto = { name: 'Laptop', categoryId: 1, description: null, imageUrl: null };
 
   it('creates and returns a product when category exists', async () => {
-    categoryRepo.findById.mockResolvedValue(makeProductCategory({ id: 1 }));
+    categoryRepo.findById.mockResolvedValue(ok(makeProductCategory({ id: 1 })));
     const saved = makeProduct(dto);
-    productRepo.save.mockResolvedValue(saved);
+    productRepo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(dto);
 
     expect(categoryRepo.findById).toHaveBeenCalledWith(1);
     expect(productRepo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
-  it('throws NotFoundException when category does not exist', async () => {
-    categoryRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when category does not exist', async () => {
+    categoryRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(productRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws with correct message for missing category', async () => {
-    categoryRepo.findById.mockResolvedValue(null);
+  it('returns error with correct message for missing category', async () => {
+    categoryRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(
-      'ProductCategory with id 1 not found',
-    );
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('ProductCategory with id 1 not found');
   });
 });

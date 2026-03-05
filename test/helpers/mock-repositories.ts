@@ -51,6 +51,7 @@ export function makeMockProductRepository(): Mocked<IProductRepository> {
 
 export function makeMockStockRepository(): Mocked<IStockRepository> {
   return {
+    findAll: jest.fn(),
     findById: jest.fn(),
     findByProductId: jest.fn(),
     save: jest.fn(),

@@ -95,7 +95,9 @@ describe('TransactionController (e2e)', () => {
   describe('PATCH /transactions/:id', () => {
     it('returns 200 after successful status update', async () => {
       repos.transaction.findById.mockResolvedValue(makeTransaction({ id: 1 }));
-      repos.transactionStatus.findById.mockResolvedValue(makeTransactionStatus({ id: 2, name: 'APPROVED' }));
+      repos.transactionStatus.findById.mockResolvedValue(
+        makeTransactionStatus({ id: 2, name: 'APPROVED' }),
+      );
       repos.transaction.save.mockResolvedValue(makeTransaction({ id: 1, transactionStatusId: 2 }));
 
       const response = await app.inject({

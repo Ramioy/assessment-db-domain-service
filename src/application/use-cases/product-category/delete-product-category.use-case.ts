@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
+import { ok, err, type Result } from '@shared/result';
 
 @Injectable()
 export class DeleteProductCategoryUseCase {
@@ -9,11 +10,14 @@ export class DeleteProductCategoryUseCase {
     private readonly repository: IProductCategoryRepository,
   ) {}
 
-  async execute(id: number): Promise<void> {
-    const entity = await this.repository.findById(id);
-    if (!entity) {
-      throw new NotFoundException('ProductCategory', id);
-    }
-    await this.repository.delete(id);
+  async execute(id: number): Promise<Result<void, DomainError>> {
+    const findResult = await this.repository.findById(id);
+    if (!findResult.ok) return findResult;
+    if (!findResult.value) return err(new NotFoundError('ProductCategory', id));
+
+    const deleteResult = await this.repository.delete(id);
+    if (!deleteResult.ok) return deleteResult;
+
+    return ok(undefined);
   }
 }

@@ -1,5 +1,6 @@
 import { FindDeliveryUseCase } from '@application/use-cases/delivery/find-delivery.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import { makeMockDeliveryRepository } from '../../../../helpers/mock-repositories';
 import { makeDelivery } from '../../../../helpers/entity-factory';
 
@@ -14,23 +15,30 @@ describe('FindDeliveryUseCase', () => {
 
   it('returns the delivery when found', async () => {
     const delivery = makeDelivery({ id: 1 });
-    repo.findById.mockResolvedValue(delivery);
+    repo.findById.mockResolvedValue(ok(delivery));
 
     const result = await useCase.execute(1);
 
     expect(repo.findById).toHaveBeenCalledWith(1);
-    expect(result).toBe(delivery);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(delivery);
   });
 
-  it('throws NotFoundException when delivery does not exist', async () => {
-    repo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when delivery does not exist', async () => {
+    repo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
   });
 
-  it('throws with correct message', async () => {
-    repo.findById.mockResolvedValue(null);
+  it('returns error with correct message', async () => {
+    repo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(7)).rejects.toThrow('Delivery with id 7 not found');
+    const result = await useCase.execute(7);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('Delivery with id 7 not found');
   });
 });

@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Transaction, CreateTransactionDto } from '@domain/models/transaction.entity';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { TransactionService } from '@domain/services/transaction.service';
 import { ITransactionRepository } from '@application/ports/out/transaction-repository.port';
 import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
 import { ITransactionStatusRepository } from '@application/ports/out/transaction-status-repository.port';
+import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class CreateTransactionUseCase {
@@ -19,17 +20,25 @@ export class CreateTransactionUseCase {
     private readonly statusRepository: ITransactionStatusRepository,
   ) {}
 
-  async execute(dto: CreateTransactionDto): Promise<Transaction> {
-    this.transactionService.validateTransactionCreation(dto.customerId, dto.transactionStatusId);
+  async execute(dto: CreateTransactionDto): Promise<Result<Transaction, DomainError>> {
+    const validation = this.transactionService.validateTransactionCreation(
+      dto.customerId,
+      dto.transactionStatusId,
+    );
+    if (!validation.ok) return validation;
 
-    const customer = await this.customerRepository.findById(dto.customerId);
-    if (!customer) {
-      throw new NotFoundException('Customer', dto.customerId);
+    const customerResult = await this.customerRepository.findById(dto.customerId);
+    if (!customerResult.ok) return customerResult;
+    if (!customerResult.value) {
+      return err(new NotFoundError('Customer', dto.customerId));
     }
-    const status = await this.statusRepository.findById(dto.transactionStatusId);
-    if (!status) {
-      throw new NotFoundException('TransactionStatus', dto.transactionStatusId);
+
+    const statusResult = await this.statusRepository.findById(dto.transactionStatusId);
+    if (!statusResult.ok) return statusResult;
+    if (!statusResult.value) {
+      return err(new NotFoundError('TransactionStatus', dto.transactionStatusId));
     }
+
     const entity = Object.assign(new Transaction(), dto);
     return this.transactionRepository.save(entity);
   }

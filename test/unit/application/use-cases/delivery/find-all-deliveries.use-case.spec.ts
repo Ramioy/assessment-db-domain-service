@@ -1,4 +1,5 @@
 import { FindAllDeliveriesUseCase } from '@application/use-cases/delivery/find-all-deliveries.use-case';
+import { ok } from '@shared/result';
 import { makeMockDeliveryRepository } from '../../../../helpers/mock-repositories';
 import { makeDelivery } from '../../../../helpers/entity-factory';
 
@@ -13,35 +14,38 @@ describe('FindAllDeliveriesUseCase', () => {
 
   it('returns all deliveries when no filters are given', async () => {
     const deliveries = [makeDelivery({ id: 1 }), makeDelivery({ id: 2 })];
-    repo.findAll.mockResolvedValue(deliveries);
+    repo.findAll.mockResolvedValue(ok(deliveries));
 
     const result = await useCase.execute();
 
     expect(repo.findAll).toHaveBeenCalledTimes(1);
     expect(repo.findByTransactionId).not.toHaveBeenCalled();
     expect(repo.findByCustomerId).not.toHaveBeenCalled();
-    expect(result).toEqual(deliveries);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toEqual(deliveries);
   });
 
   it('filters by transactionId when provided (takes priority over customerId)', async () => {
     const deliveries = [makeDelivery({ id: 1, transactionId: 5 })];
-    repo.findByTransactionId.mockResolvedValue(deliveries);
+    repo.findByTransactionId.mockResolvedValue(ok(deliveries));
 
     const result = await useCase.execute(5, 2);
 
     expect(repo.findByTransactionId).toHaveBeenCalledWith(5);
     expect(repo.findByCustomerId).not.toHaveBeenCalled();
-    expect(result).toEqual(deliveries);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toEqual(deliveries);
   });
 
   it('filters by customerId when transactionId is not provided', async () => {
     const deliveries = [makeDelivery({ id: 1, customerId: 3 })];
-    repo.findByCustomerId.mockResolvedValue(deliveries);
+    repo.findByCustomerId.mockResolvedValue(ok(deliveries));
 
     const result = await useCase.execute(undefined, 3);
 
     expect(repo.findByCustomerId).toHaveBeenCalledWith(3);
     expect(repo.findAll).not.toHaveBeenCalled();
-    expect(result).toEqual(deliveries);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toEqual(deliveries);
   });
 });

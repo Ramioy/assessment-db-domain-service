@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Product } from '@domain/models/product.entity';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { IProductRepository } from '@application/ports/out/product-repository.port';
+import { ok, err, type Result } from '@shared/result';
 
 @Injectable()
 export class FindProductUseCase {
@@ -10,11 +11,10 @@ export class FindProductUseCase {
     private readonly repository: IProductRepository,
   ) {}
 
-  async execute(id: number): Promise<Product> {
-    const entity = await this.repository.findById(id);
-    if (!entity) {
-      throw new NotFoundException('Product', id);
-    }
-    return entity;
+  async execute(id: number): Promise<Result<Product, DomainError>> {
+    const result = await this.repository.findById(id);
+    if (!result.ok) return result;
+    if (!result.value) return err(new NotFoundError('Product', id));
+    return ok(result.value);
   }
 }

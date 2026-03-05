@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Stock, UpdateStockDto } from '@domain/models/stock.entity';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError, type DomainError } from '@domain/errors';
 import { IStockRepository } from '@application/ports/out/stock-repository.port';
+import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class UpdateStockUseCase {
@@ -10,12 +11,12 @@ export class UpdateStockUseCase {
     private readonly repository: IStockRepository,
   ) {}
 
-  async execute(productId: number, dto: UpdateStockDto): Promise<Stock> {
-    const entity = await this.repository.findByProductId(productId);
-    if (!entity) {
-      throw new NotFoundException('Stock for product', productId);
-    }
-    Object.assign(entity, dto);
-    return this.repository.save(entity);
+  async execute(productId: number, dto: UpdateStockDto): Promise<Result<Stock, DomainError>> {
+    const findResult = await this.repository.findByProductId(productId);
+    if (!findResult.ok) return findResult;
+    if (!findResult.value) return err(new NotFoundError('Stock for product', productId));
+
+    Object.assign(findResult.value, dto);
+    return this.repository.save(findResult.value);
   }
 }

@@ -1,5 +1,6 @@
 import { UpdateCustomerUseCase } from '@application/use-cases/customer/update-customer.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import { makeMockCustomerRepository } from '../../../../helpers/mock-repositories';
 import { makeCustomer } from '../../../../helpers/entity-factory';
 
@@ -16,32 +17,39 @@ describe('UpdateCustomerUseCase', () => {
     const existing = makeCustomer({ id: 1, contactPhone: null });
     const dto = { contactPhone: '+57 300 111 2222' };
     const saved = makeCustomer({ id: 1, contactPhone: '+57 300 111 2222' });
-    repo.findById.mockResolvedValue(existing);
-    repo.save.mockResolvedValue(saved);
+    repo.findById.mockResolvedValue(ok(existing));
+    repo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(1, dto);
 
     expect(repo.findById).toHaveBeenCalledWith(1);
     expect(repo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
   it('merges partial dto onto entity', async () => {
     const existing = makeCustomer({ id: 1, address: 'Old address', contactPhone: '+57 300' });
     const dto = { address: 'New address' };
-    repo.findById.mockResolvedValue(existing);
-    repo.save.mockImplementation(async (e) => e);
+    repo.findById.mockResolvedValue(ok(existing));
+    repo.save.mockImplementation((e) => Promise.resolve(ok(e)));
 
     const result = await useCase.execute(1, dto);
 
-    expect(result.address).toBe('New address');
-    expect(result.contactPhone).toBe('+57 300');
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.address).toBe('New address');
+      expect(result.value.contactPhone).toBe('+57 300');
+    }
   });
 
-  it('throws NotFoundException when customer does not exist', async () => {
-    repo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when customer does not exist', async () => {
+    repo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99, {})).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99, {});
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(repo.save).not.toHaveBeenCalled();
   });
 });

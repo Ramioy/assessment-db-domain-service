@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from '@presentation/controllers/health.controller';
-import { DataSource } from 'typeorm';
 import { getDataSourceToken } from '@nestjs/typeorm';
 
 describe('HealthController', () => {

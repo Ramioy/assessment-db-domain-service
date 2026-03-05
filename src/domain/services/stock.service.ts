@@ -1,19 +1,25 @@
+import { ok, err, type Result } from '@shared/result';
 import { Stock } from '@domain/models/stock.entity';
-import { InsufficientStockException } from '@domain/exceptions/insufficient-stock.exception';
+import { InsufficientStockError } from '@domain/errors';
 
 export class StockService {
-  validateStockAvailability(stock: Stock, requestedQty: number): void {
+  validateStockAvailability(
+    stock: Stock,
+    requestedQty: number,
+  ): Result<void, InsufficientStockError> {
     if (requestedQty <= 0) {
-      throw new Error('Requested quantity must be greater than zero');
+      return err(new InsufficientStockError(stock.productId, requestedQty, stock.quantity));
     }
     if (stock.quantity < requestedQty) {
-      throw new InsufficientStockException(stock.productId, requestedQty, stock.quantity);
+      return err(new InsufficientStockError(stock.productId, requestedQty, stock.quantity));
     }
+    return ok(undefined);
   }
 
-  decrementStock(stock: Stock, qty: number): Stock {
-    this.validateStockAvailability(stock, qty);
+  decrementStock(stock: Stock, qty: number): Result<Stock, InsufficientStockError> {
+    const validation = this.validateStockAvailability(stock, qty);
+    if (!validation.ok) return validation;
     stock.quantity -= qty;
-    return stock;
+    return ok(stock);
   }
 }

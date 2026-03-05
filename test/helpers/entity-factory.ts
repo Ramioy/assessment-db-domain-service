@@ -19,9 +19,7 @@ const NOW = new Date('2024-01-15T10:00:00.000Z');
 
 // ── ProductCategory ───────────────────────────────────────────
 
-export function makeProductCategory(
-  overrides: Partial<ProductCategory> = {},
-): ProductCategory {
+export function makeProductCategory(overrides: Partial<ProductCategory> = {}): ProductCategory {
   return Object.assign(new ProductCategory(), {
     id: 1,
     name: 'Electronics',
@@ -115,9 +113,7 @@ export function makeTransactionStatus(
 
 // ── Transaction ───────────────────────────────────────────────
 
-export function makeTransaction(
-  overrides: Partial<Transaction> = {},
-): Transaction {
+export function makeTransaction(overrides: Partial<Transaction> = {}): Transaction {
   return Object.assign(new Transaction(), {
     id: 1,
     customerId: 1,

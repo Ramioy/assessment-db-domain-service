@@ -41,7 +41,10 @@ describe('HttpErrorFilter', () => {
   });
 
   it('handles HttpException with object response body', () => {
-    const exception = new HttpException({ message: 'Bad input', errors: [] }, HttpStatus.BAD_REQUEST);
+    const exception = new HttpException(
+      { message: 'Bad input', errors: [] },
+      HttpStatus.BAD_REQUEST,
+    );
     filter.catch(exception, host);
 
     expect(reply.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
@@ -54,7 +57,7 @@ describe('HttpErrorFilter', () => {
 
     expect(reply.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
     expect(reply.send).toHaveBeenCalledWith(
-      expect.objectContaining({ statusCode: 500, message: 'Internal server error' }),
+      expect.objectContaining({ statusCode: 500, message: 'Unexpected' }),
     );
   });
 

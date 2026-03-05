@@ -1,5 +1,6 @@
 import { UpdateTransactionUseCase } from '@application/use-cases/transaction/update-transaction.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import {
   makeMockTransactionRepository,
   makeMockTransactionStatusRepository,
@@ -21,42 +22,52 @@ describe('UpdateTransactionUseCase', () => {
     const existing = makeTransaction({ id: 1, cut: null });
     const dto = { cut: 'CUT-001' };
     const saved = makeTransaction({ id: 1, cut: 'CUT-001' });
-    transactionRepo.findById.mockResolvedValue(existing);
-    transactionRepo.save.mockResolvedValue(saved);
+    transactionRepo.findById.mockResolvedValue(ok(existing));
+    transactionRepo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(1, dto);
 
     expect(transactionRepo.findById).toHaveBeenCalledWith(1);
     expect(statusRepo.findById).not.toHaveBeenCalled();
     expect(transactionRepo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
   it('validates statusId when provided in dto', async () => {
     const existing = makeTransaction({ id: 1 });
     const dto = { transactionStatusId: 2 };
-    transactionRepo.findById.mockResolvedValue(existing);
-    statusRepo.findById.mockResolvedValue(makeTransactionStatus({ id: 2, name: 'APPROVED' }));
-    transactionRepo.save.mockImplementation(async (e) => e);
+    transactionRepo.findById.mockResolvedValue(ok(existing));
+    statusRepo.findById.mockResolvedValue(ok(makeTransactionStatus({ id: 2, name: 'APPROVED' })));
+    transactionRepo.save.mockImplementation((e) => Promise.resolve(ok(e)));
 
     const result = await useCase.execute(1, dto);
 
     expect(statusRepo.findById).toHaveBeenCalledWith(2);
-    expect(result.transactionStatusId).toBe(2);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.transactionStatusId).toBe(2);
+    }
   });
 
-  it('throws NotFoundException when transaction does not exist', async () => {
-    transactionRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when transaction does not exist', async () => {
+    transactionRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99, {})).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99, {});
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(transactionRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws NotFoundException when new statusId does not exist', async () => {
-    transactionRepo.findById.mockResolvedValue(makeTransaction({ id: 1 }));
-    statusRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when new statusId does not exist', async () => {
+    transactionRepo.findById.mockResolvedValue(ok(makeTransaction({ id: 1 })));
+    statusRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(1, { transactionStatusId: 999 })).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(1, { transactionStatusId: 999 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(transactionRepo.save).not.toHaveBeenCalled();
   });
 });

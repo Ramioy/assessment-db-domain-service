@@ -1,5 +1,6 @@
 import { FindDeliveriesByTransactionUseCase } from '@application/use-cases/delivery/find-deliveries-by-transaction.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import {
   makeMockDeliveryRepository,
   makeMockTransactionRepository,
@@ -20,26 +21,33 @@ describe('FindDeliveriesByTransactionUseCase', () => {
   it('returns deliveries for the given transaction', async () => {
     const tx = makeTransaction({ id: 10 });
     const deliveries = [makeDelivery({ id: 1, transactionId: 10 })];
-    transactionRepo.findById.mockResolvedValue(tx);
-    deliveryRepo.findByTransactionId.mockResolvedValue(deliveries);
+    transactionRepo.findById.mockResolvedValue(ok(tx));
+    deliveryRepo.findByTransactionId.mockResolvedValue(ok(deliveries));
 
     const result = await useCase.execute(10);
 
     expect(transactionRepo.findById).toHaveBeenCalledWith(10);
     expect(deliveryRepo.findByTransactionId).toHaveBeenCalledWith(10);
-    expect(result).toEqual(deliveries);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toEqual(deliveries);
   });
 
-  it('throws NotFoundException when transaction does not exist', async () => {
-    transactionRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when transaction does not exist', async () => {
+    transactionRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(deliveryRepo.findByTransactionId).not.toHaveBeenCalled();
   });
 
-  it('throws with correct message', async () => {
-    transactionRepo.findById.mockResolvedValue(null);
+  it('returns error with correct message', async () => {
+    transactionRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99)).rejects.toThrow('Transaction with id 99 not found');
+    const result = await useCase.execute(99);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toBe('Transaction with id 99 not found');
   });
 });

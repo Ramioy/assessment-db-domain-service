@@ -1,12 +1,16 @@
 import { CreateTransactionUseCase } from '@application/use-cases/transaction/create-transaction.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
-import { InvalidTransactionException } from '@domain/exceptions/invalid-transaction.exception';
+import { NotFoundError, InvalidTransactionError } from '@domain/errors';
+import { ok } from '@shared/result';
 import {
   makeMockTransactionRepository,
   makeMockCustomerRepository,
   makeMockTransactionStatusRepository,
 } from '../../../../helpers/mock-repositories';
-import { makeCustomer, makeTransaction, makeTransactionStatus } from '../../../../helpers/entity-factory';
+import {
+  makeCustomer,
+  makeTransaction,
+  makeTransactionStatus,
+} from '../../../../helpers/entity-factory';
 
 describe('CreateTransactionUseCase', () => {
   let useCase: CreateTransactionUseCase;
@@ -24,44 +28,53 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('creates and returns a transaction when all validations pass', async () => {
-    customerRepo.findById.mockResolvedValue(makeCustomer({ id: 1 }));
-    statusRepo.findById.mockResolvedValue(makeTransactionStatus({ id: 1 }));
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer({ id: 1 })));
+    statusRepo.findById.mockResolvedValue(ok(makeTransactionStatus({ id: 1 })));
     const saved = makeTransaction(dto);
-    transactionRepo.save.mockResolvedValue(saved);
+    transactionRepo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(dto);
 
     expect(customerRepo.findById).toHaveBeenCalledWith(1);
     expect(statusRepo.findById).toHaveBeenCalledWith(1);
     expect(transactionRepo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
-  it('throws InvalidTransactionException when customerId is 0', async () => {
-    await expect(useCase.execute({ ...dto, customerId: 0 })).rejects.toThrow(
-      InvalidTransactionException,
-    );
+  it('returns InvalidTransactionError when customerId is 0', async () => {
+    const result = await useCase.execute({ ...dto, customerId: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(InvalidTransactionError);
     expect(transactionRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws InvalidTransactionException when statusId is 0', async () => {
-    await expect(
-      useCase.execute({ ...dto, transactionStatusId: 0 }),
-    ).rejects.toThrow(InvalidTransactionException);
+  it('returns InvalidTransactionError when statusId is 0', async () => {
+    const result = await useCase.execute({ ...dto, transactionStatusId: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(InvalidTransactionError);
   });
 
-  it('throws NotFoundException when customer does not exist', async () => {
-    customerRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when customer does not exist', async () => {
+    customerRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(transactionRepo.save).not.toHaveBeenCalled();
   });
 
-  it('throws NotFoundException when status does not exist', async () => {
-    customerRepo.findById.mockResolvedValue(makeCustomer());
-    statusRepo.findById.mockResolvedValue(null);
+  it('returns NotFoundError when status does not exist', async () => {
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer()));
+    statusRepo.findById.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(transactionRepo.save).not.toHaveBeenCalled();
   });
 });

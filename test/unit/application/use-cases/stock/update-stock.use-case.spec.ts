@@ -1,5 +1,6 @@
 import { UpdateStockUseCase } from '@application/use-cases/stock/update-stock.use-case';
-import { NotFoundException } from '@domain/exceptions/not-found.exception';
+import { NotFoundError } from '@domain/errors';
+import { ok } from '@shared/result';
 import { makeMockStockRepository } from '../../../../helpers/mock-repositories';
 import { makeStock } from '../../../../helpers/entity-factory';
 
@@ -16,32 +17,39 @@ describe('UpdateStockUseCase', () => {
     const existing = makeStock({ productId: 1, quantity: 10 });
     const dto = { quantity: 25 };
     const saved = makeStock({ productId: 1, quantity: 25 });
-    repo.findByProductId.mockResolvedValue(existing);
-    repo.save.mockResolvedValue(saved);
+    repo.findByProductId.mockResolvedValue(ok(existing));
+    repo.save.mockResolvedValue(ok(saved));
 
     const result = await useCase.execute(1, dto);
 
     expect(repo.findByProductId).toHaveBeenCalledWith(1);
     expect(repo.save).toHaveBeenCalledTimes(1);
-    expect(result).toBe(saved);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toBe(saved);
   });
 
   it('merges partial dto onto entity', async () => {
     const existing = makeStock({ productId: 1, quantity: 10, description: 'Old' });
     const dto = { description: 'New' };
-    repo.findByProductId.mockResolvedValue(existing);
-    repo.save.mockImplementation(async (e) => e);
+    repo.findByProductId.mockResolvedValue(ok(existing));
+    repo.save.mockImplementation((e) => Promise.resolve(ok(e)));
 
     const result = await useCase.execute(1, dto);
 
-    expect(result.description).toBe('New');
-    expect(result.quantity).toBe(10);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.description).toBe('New');
+      expect(result.value.quantity).toBe(10);
+    }
   });
 
-  it('throws NotFoundException when stock does not exist', async () => {
-    repo.findByProductId.mockResolvedValue(null);
+  it('returns NotFoundError when stock does not exist', async () => {
+    repo.findByProductId.mockResolvedValue(ok(null));
 
-    await expect(useCase.execute(99, {})).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(99, {});
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(repo.save).not.toHaveBeenCalled();
   });
 });

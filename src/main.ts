@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpErrorFilter } from './shared/filters';
+import { LoggingInterceptor } from './shared/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -14,9 +16,17 @@ async function bootstrap() {
   const apiVersion = config.get<string>('API_VERSION', 'v1');
   const corsEnabled = config.get<boolean>('CORS_ENABLED', false);
   const corsOrigin = config.get<string>('CORS_ORIGIN', '');
+  const enableSwagger = config.get<boolean>('ENABLE_SWAGGER', false);
+  const appName = config.get<string>('APP_NAME', 'assessment-db-domain-service');
+  const appDescription = config.get<string>('APP_DESCRIPTION', 'Database domain backend service');
 
   // Global API prefix: e.g. /api/v1
   app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+
+  // Helmet security headers
+  await app.register(import('@fastify/helmet'), {
+    contentSecurityPolicy: false,
+  });
 
   // CORS via Fastify plugin
   if (corsEnabled) {
@@ -30,7 +40,20 @@ async function bootstrap() {
     });
   }
 
-  // Global exception filter
+  // Swagger / OpenAPI
+  if (enableSwagger) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(appName)
+      .setDescription(appDescription)
+      .setVersion(apiVersion)
+      .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('docs', app, document);
+  }
+
+  // Global interceptors and filters
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new HttpErrorFilter());
 
   // Graceful shutdown
