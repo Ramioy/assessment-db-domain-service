@@ -1,9 +1,11 @@
 import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@domain/models/customer.entity';
+import type { DomainError } from '@domain/errors';
+import type { Result } from '@shared/result';
 
-export interface ICustomerInputPort {
-  create(dto: CreateCustomerDto): Promise<Customer>;
-  findById(id: number): Promise<Customer>;
-  findAll(): Promise<Customer[]>;
-  update(id: number, dto: UpdateCustomerDto): Promise<Customer>;
-  delete(id: number): Promise<void>;
+export interface CustomerInputPort {
+  create(dto: CreateCustomerDto): Promise<Result<Customer, DomainError>>;
+  findById(id: number): Promise<Result<Customer, DomainError>>;
+  findAll(): Promise<Result<Customer[], DomainError>>;
+  update(id: number, dto: UpdateCustomerDto): Promise<Result<Customer, DomainError>>;
+  delete(id: number): Promise<Result<void, DomainError>>;
 }

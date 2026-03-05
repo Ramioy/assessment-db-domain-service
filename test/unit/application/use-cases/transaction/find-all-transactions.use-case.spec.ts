@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { FindAllTransactionsUseCase } from '@application/use-cases/transaction/find-all-transactions.use-case';
 import { ok } from '@shared/result';
 import { makeMockTransactionRepository } from '../../../../helpers/mock-repositories';

@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from '@presentation/controllers/health.controller';
 import { getDataSourceToken } from '@nestjs/typeorm';

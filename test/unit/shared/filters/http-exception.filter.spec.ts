@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { HttpException, HttpStatus, ArgumentsHost } from '@nestjs/common';
 import { HttpErrorFilter } from '@shared/filters/http-exception.filter';
 

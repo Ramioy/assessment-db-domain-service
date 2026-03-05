@@ -2,7 +2,7 @@ import type { Result } from '@shared/result';
 import type { InfrastructureError } from '@domain/errors';
 import { Transaction } from '@domain/models/transaction.entity';
 
-export interface ITransactionRepository {
+export interface TransactionRepositoryPort {
   findById(id: number): Promise<Result<Transaction | null, InfrastructureError>>;
   findByCustomerId(customerId: number): Promise<Result<Transaction[], InfrastructureError>>;
   findAll(): Promise<Result<Transaction[], InfrastructureError>>;

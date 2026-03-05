@@ -1,13 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { NotFoundError, type DomainError } from '@domain/errors';
-import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
+import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
 import { ok, err, type Result } from '@shared/result';
 
 @Injectable()
 export class DeleteCustomerUseCase {
   constructor(
-    @Inject('ICustomerRepository')
-    private readonly repository: ICustomerRepository,
+    @Inject(DI_TOKENS.CUSTOMER_REPOSITORY)
+    private readonly repository: CustomerRepositoryPort,
   ) {}
 
   async execute(id: number): Promise<Result<void, DomainError>> {

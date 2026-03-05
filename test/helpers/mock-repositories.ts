@@ -10,21 +10,21 @@
  *   repo.findById.mockResolvedValue(someCategory);
  */
 
-import type { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
-import type { IProductRepository } from '@application/ports/out/product-repository.port';
-import type { IStockRepository } from '@application/ports/out/stock-repository.port';
-import type { ICustomerDocumentTypeRepository } from '@application/ports/out/customer-document-type-repository.port';
-import type { ICustomerRepository } from '@application/ports/out/customer-repository.port';
-import type { ITransactionStatusRepository } from '@application/ports/out/transaction-status-repository.port';
-import type { ITransactionRepository } from '@application/ports/out/transaction-repository.port';
-import type { IDeliveryRepository } from '@application/ports/out/delivery-repository.port';
+import type { ProductCategoryRepositoryPort } from '@application/ports/out/product-category-repository.port';
+import type { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
+import type { StockRepositoryPort } from '@application/ports/out/stock-repository.port';
+import type { CustomerDocumentTypeRepositoryPort } from '@application/ports/out/customer-document-type-repository.port';
+import type { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
+import type { TransactionStatusRepositoryPort } from '@application/ports/out/transaction-status-repository.port';
+import type { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
+import type { DeliveryRepositoryPort } from '@application/ports/out/delivery-repository.port';
 
 // Helper type: turn every method into a jest.Mock
 type Mocked<T> = { [K in keyof T]: jest.Mock };
 
 // ── ProductCategory ───────────────────────────────────────────
 
-export function makeMockProductCategoryRepository(): Mocked<IProductCategoryRepository> {
+export function makeMockProductCategoryRepository(): Mocked<ProductCategoryRepositoryPort> {
   return {
     findById: jest.fn(),
     findAll: jest.fn(),
@@ -36,7 +36,7 @@ export function makeMockProductCategoryRepository(): Mocked<IProductCategoryRepo
 
 // ── Product ───────────────────────────────────────────────────
 
-export function makeMockProductRepository(): Mocked<IProductRepository> {
+export function makeMockProductRepository(): Mocked<ProductRepositoryPort> {
   return {
     findById: jest.fn(),
     findByUuid: jest.fn(),
@@ -49,7 +49,7 @@ export function makeMockProductRepository(): Mocked<IProductRepository> {
 
 // ── Stock ─────────────────────────────────────────────────────
 
-export function makeMockStockRepository(): Mocked<IStockRepository> {
+export function makeMockStockRepository(): Mocked<StockRepositoryPort> {
   return {
     findAll: jest.fn(),
     findById: jest.fn(),
@@ -61,7 +61,7 @@ export function makeMockStockRepository(): Mocked<IStockRepository> {
 
 // ── CustomerDocumentType ──────────────────────────────────────
 
-export function makeMockCustomerDocumentTypeRepository(): Mocked<ICustomerDocumentTypeRepository> {
+export function makeMockCustomerDocumentTypeRepository(): Mocked<CustomerDocumentTypeRepositoryPort> {
   return {
     findById: jest.fn(),
     findAll: jest.fn(),
@@ -72,7 +72,7 @@ export function makeMockCustomerDocumentTypeRepository(): Mocked<ICustomerDocume
 
 // ── Customer ──────────────────────────────────────────────────
 
-export function makeMockCustomerRepository(): Mocked<ICustomerRepository> {
+export function makeMockCustomerRepository(): Mocked<CustomerRepositoryPort> {
   return {
     findById: jest.fn(),
     findByEmail: jest.fn(),
@@ -85,7 +85,7 @@ export function makeMockCustomerRepository(): Mocked<ICustomerRepository> {
 
 // ── TransactionStatus ─────────────────────────────────────────
 
-export function makeMockTransactionStatusRepository(): Mocked<ITransactionStatusRepository> {
+export function makeMockTransactionStatusRepository(): Mocked<TransactionStatusRepositoryPort> {
   return {
     findById: jest.fn(),
     findByName: jest.fn(),
@@ -97,7 +97,7 @@ export function makeMockTransactionStatusRepository(): Mocked<ITransactionStatus
 
 // ── Transaction ───────────────────────────────────────────────
 
-export function makeMockTransactionRepository(): Mocked<ITransactionRepository> {
+export function makeMockTransactionRepository(): Mocked<TransactionRepositoryPort> {
   return {
     findById: jest.fn(),
     findByCustomerId: jest.fn(),
@@ -109,7 +109,7 @@ export function makeMockTransactionRepository(): Mocked<ITransactionRepository> 
 
 // ── Delivery ──────────────────────────────────────────────────
 
-export function makeMockDeliveryRepository(): Mocked<IDeliveryRepository> {
+export function makeMockDeliveryRepository(): Mocked<DeliveryRepositoryPort> {
   return {
     findById: jest.fn(),
     findByUuid: jest.fn(),

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from '@domain/models/customer.entity';
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
-import { DI_TOKENS } from '@infrastructure/config/di-tokens';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { CustomerRepository } from '@infrastructure/adapters/database/customer.repository';
 import { CustomerDocumentTypeRepository } from '@infrastructure/adapters/database/customer-document-type.repository';
 import { CreateCustomerUseCase } from '@application/use-cases/customer/create-customer.use-case';

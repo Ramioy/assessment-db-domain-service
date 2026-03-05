@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
-  Optional,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
@@ -70,7 +69,7 @@ export class TransactionController {
     description: 'Filter by customer ID',
   })
   @ApiResponse({ status: 200, description: 'List of transactions' })
-  async findAll(@Query('customerId') @Optional() customerId?: string) {
+  async findAll(@Query('customerId') customerId?: string) {
     const parsedCustomerId = customerId !== undefined ? parseInt(customerId, 10) : undefined;
     return unwrapResult(await this.findAllUseCase.execute(parsedCustomerId));
   }

@@ -1,10 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import { AppModule } from './app.module';
 import { HttpErrorFilter } from './shared/filters';
 import { LoggingInterceptor } from './shared/interceptors';
+
+const logger = new Logger('Bootstrap');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -60,10 +64,10 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(port, host);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap().catch((error) => {
-  console.error('Failed to start application:', error);
+  logger.error('Failed to start application:', error);
   process.exit(1);
 });

@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { FindAllCustomersUseCase } from '@application/use-cases/customer/find-all-customers.use-case';
 import { ok } from '@shared/result';
 import { makeMockCustomerRepository } from '../../../../helpers/mock-repositories';

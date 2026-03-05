@@ -13,7 +13,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { HttpErrorFilter } from '@shared/filters/http-exception.filter';
-import { DI_TOKENS } from '@infrastructure/config/di-tokens';
+import { DI_TOKENS } from '@shared/di-tokens';
 
 // Controllers
 import { ProductCategoryController } from '@presentation/controllers/product-category.controller';

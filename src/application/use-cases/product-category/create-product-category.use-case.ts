@@ -1,14 +1,15 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { ProductCategory, CreateProductCategoryDto } from '@domain/models/product-category.entity';
 import { AlreadyExistsError, type DomainError } from '@domain/errors';
-import { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
+import { ProductCategoryRepositoryPort } from '@application/ports/out/product-category-repository.port';
 import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class CreateProductCategoryUseCase {
   constructor(
-    @Inject('IProductCategoryRepository')
-    private readonly repository: IProductCategoryRepository,
+    @Inject(DI_TOKENS.PRODUCT_CATEGORY_REPOSITORY)
+    private readonly repository: ProductCategoryRepositoryPort,
   ) {}
 
   async execute(dto: CreateProductCategoryDto): Promise<Result<ProductCategory, DomainError>> {

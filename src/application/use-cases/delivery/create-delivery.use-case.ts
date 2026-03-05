@@ -1,20 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { Delivery, CreateDeliveryDto } from '@domain/models/delivery.entity';
 import { NotFoundError, type DomainError } from '@domain/errors';
-import { IDeliveryRepository } from '@application/ports/out/delivery-repository.port';
-import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
-import { ITransactionRepository } from '@application/ports/out/transaction-repository.port';
+import { DeliveryRepositoryPort } from '@application/ports/out/delivery-repository.port';
+import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
+import { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
 import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class CreateDeliveryUseCase {
   constructor(
-    @Inject('IDeliveryRepository')
-    private readonly deliveryRepository: IDeliveryRepository,
-    @Inject('ICustomerRepository')
-    private readonly customerRepository: ICustomerRepository,
-    @Inject('ITransactionRepository')
-    private readonly transactionRepository: ITransactionRepository,
+    @Inject(DI_TOKENS.DELIVERY_REPOSITORY)
+    private readonly deliveryRepository: DeliveryRepositoryPort,
+    @Inject(DI_TOKENS.CUSTOMER_REPOSITORY)
+    private readonly customerRepository: CustomerRepositoryPort,
+    @Inject(DI_TOKENS.TRANSACTION_REPOSITORY)
+    private readonly transactionRepository: TransactionRepositoryPort,
   ) {}
 
   async execute(dto: CreateDeliveryDto): Promise<Result<Delivery, DomainError>> {

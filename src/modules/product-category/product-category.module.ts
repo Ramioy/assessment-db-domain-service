@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductCategory } from '@domain/models/product-category.entity';
-import { DI_TOKENS } from '@infrastructure/config/di-tokens';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { ProductCategoryRepository } from '@infrastructure/adapters/database/product-category.repository';
 import { CreateProductCategoryUseCase } from '@application/use-cases/product-category/create-product-category.use-case';
 import { FindProductCategoryUseCase } from '@application/use-cases/product-category/find-product-category.use-case';

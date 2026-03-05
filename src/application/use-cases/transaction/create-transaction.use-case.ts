@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { Transaction, CreateTransactionDto } from '@domain/models/transaction.entity';
 import { NotFoundError, type DomainError } from '@domain/errors';
 import { TransactionService } from '@domain/services/transaction.service';
-import { ITransactionRepository } from '@application/ports/out/transaction-repository.port';
-import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
-import { ITransactionStatusRepository } from '@application/ports/out/transaction-status-repository.port';
+import { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
+import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
+import { TransactionStatusRepositoryPort } from '@application/ports/out/transaction-status-repository.port';
 import { err, type Result } from '@shared/result';
 
 @Injectable()
@@ -12,12 +13,12 @@ export class CreateTransactionUseCase {
   private readonly transactionService = new TransactionService();
 
   constructor(
-    @Inject('ITransactionRepository')
-    private readonly transactionRepository: ITransactionRepository,
-    @Inject('ICustomerRepository')
-    private readonly customerRepository: ICustomerRepository,
-    @Inject('ITransactionStatusRepository')
-    private readonly statusRepository: ITransactionStatusRepository,
+    @Inject(DI_TOKENS.TRANSACTION_REPOSITORY)
+    private readonly transactionRepository: TransactionRepositoryPort,
+    @Inject(DI_TOKENS.CUSTOMER_REPOSITORY)
+    private readonly customerRepository: CustomerRepositoryPort,
+    @Inject(DI_TOKENS.TRANSACTION_STATUS_REPOSITORY)
+    private readonly statusRepository: TransactionStatusRepositoryPort,
   ) {}
 
   async execute(dto: CreateTransactionDto): Promise<Result<Transaction, DomainError>> {

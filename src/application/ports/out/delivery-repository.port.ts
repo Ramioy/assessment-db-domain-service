@@ -2,7 +2,7 @@ import type { Result } from '@shared/result';
 import type { InfrastructureError } from '@domain/errors';
 import { Delivery } from '@domain/models/delivery.entity';
 
-export interface IDeliveryRepository {
+export interface DeliveryRepositoryPort {
   findById(id: number): Promise<Result<Delivery | null, InfrastructureError>>;
   findByUuid(uuid: string): Promise<Result<Delivery | null, InfrastructureError>>;
   findByTransactionId(transactionId: number): Promise<Result<Delivery[], InfrastructureError>>;

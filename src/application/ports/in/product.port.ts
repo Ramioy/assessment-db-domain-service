@@ -1,9 +1,11 @@
 import { Product, CreateProductDto, UpdateProductDto } from '@domain/models/product.entity';
+import type { DomainError } from '@domain/errors';
+import type { Result } from '@shared/result';
 
-export interface IProductInputPort {
-  create(dto: CreateProductDto): Promise<Product>;
-  findById(id: number): Promise<Product>;
-  findAll(categoryId?: number): Promise<Product[]>;
-  update(id: number, dto: UpdateProductDto): Promise<Product>;
-  delete(id: number): Promise<void>;
+export interface ProductInputPort {
+  create(dto: CreateProductDto): Promise<Result<Product, DomainError>>;
+  findById(id: number): Promise<Result<Product, DomainError>>;
+  findAll(categoryId?: number): Promise<Result<Product[], DomainError>>;
+  update(id: number, dto: UpdateProductDto): Promise<Result<Product, DomainError>>;
+  delete(id: number): Promise<Result<void, DomainError>>;
 }

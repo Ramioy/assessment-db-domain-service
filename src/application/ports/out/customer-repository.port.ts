@@ -2,7 +2,7 @@ import type { Result } from '@shared/result';
 import type { InfrastructureError } from '@domain/errors';
 import { Customer } from '@domain/models/customer.entity';
 
-export interface ICustomerRepository {
+export interface CustomerRepositoryPort {
   findById(id: number): Promise<Result<Customer | null, InfrastructureError>>;
   findByEmail(email: string): Promise<Result<Customer | null, InfrastructureError>>;
   findByDocumentNumber(

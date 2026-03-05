@@ -1,5 +1,8 @@
 import 'reflect-metadata';
+import { Logger } from '@nestjs/common';
 import { AppDataSource } from '../data-source';
+
+const logger = new Logger('Seed');
 
 async function seed(): Promise<void> {
   await AppDataSource.initialize();
@@ -35,10 +38,10 @@ async function seed(): Promise<void> {
     `);
 
     await queryRunner.commitTransaction();
-    console.log('Seed completed successfully.');
+    logger.log('Seed completed successfully.');
   } catch (err) {
     await queryRunner.rollbackTransaction();
-    console.error('Seed failed, rolling back:', err);
+    logger.error('Seed failed, rolling back:', err);
     process.exit(1);
   } finally {
     await queryRunner.release();

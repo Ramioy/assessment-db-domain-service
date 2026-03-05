@@ -1,17 +1,18 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { Customer, CreateCustomerDto } from '@domain/models/customer.entity';
 import { NotFoundError, AlreadyExistsError, type DomainError } from '@domain/errors';
-import { ICustomerRepository } from '@application/ports/out/customer-repository.port';
-import { ICustomerDocumentTypeRepository } from '@application/ports/out/customer-document-type-repository.port';
+import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
+import { CustomerDocumentTypeRepositoryPort } from '@application/ports/out/customer-document-type-repository.port';
 import { err, type Result } from '@shared/result';
 
 @Injectable()
 export class CreateCustomerUseCase {
   constructor(
-    @Inject('ICustomerRepository')
-    private readonly customerRepository: ICustomerRepository,
-    @Inject('ICustomerDocumentTypeRepository')
-    private readonly documentTypeRepository: ICustomerDocumentTypeRepository,
+    @Inject(DI_TOKENS.CUSTOMER_REPOSITORY)
+    private readonly customerRepository: CustomerRepositoryPort,
+    @Inject(DI_TOKENS.CUSTOMER_DOCUMENT_TYPE_REPOSITORY)
+    private readonly documentTypeRepository: CustomerDocumentTypeRepositoryPort,
   ) {}
 
   async execute(dto: CreateCustomerDto): Promise<Result<Customer, DomainError>> {

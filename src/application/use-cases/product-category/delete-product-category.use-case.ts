@@ -1,13 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { DI_TOKENS } from '@shared/di-tokens';
 import { NotFoundError, type DomainError } from '@domain/errors';
-import { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
+import { ProductCategoryRepositoryPort } from '@application/ports/out/product-category-repository.port';
 import { ok, err, type Result } from '@shared/result';
 
 @Injectable()
 export class DeleteProductCategoryUseCase {
   constructor(
-    @Inject('IProductCategoryRepository')
-    private readonly repository: IProductCategoryRepository,
+    @Inject(DI_TOKENS.PRODUCT_CATEGORY_REPOSITORY)
+    private readonly repository: ProductCategoryRepositoryPort,
   ) {}
 
   async execute(id: number): Promise<Result<void, DomainError>> {

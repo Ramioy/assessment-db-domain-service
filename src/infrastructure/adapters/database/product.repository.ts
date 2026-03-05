@@ -2,43 +2,43 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '@domain/models/product.entity';
-import { InfrastructureError } from '@domain/errors';
-import { IProductRepository } from '@application/ports/out/product-repository.port';
+import { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
 import { fromPromise, type Result } from '@shared/result';
 
-const wrap = (e: unknown) => new InfrastructureError('DB_QUERY_FAILED', e);
+import { wrapDbError } from './base.repository';
+import type { InfrastructureError } from '@domain/errors';
 
 @Injectable()
-export class ProductRepository implements IProductRepository {
+export class ProductRepository implements ProductRepositoryPort {
   constructor(
     @InjectRepository(Product)
     private readonly repo: Repository<Product>,
   ) {}
 
   findById(id: number): Promise<Result<Product | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { id } }), wrap);
+    return fromPromise(this.repo.findOne({ where: { id } }), wrapDbError);
   }
 
   findByUuid(uuid: string): Promise<Result<Product | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { uuid } }), wrap);
+    return fromPromise(this.repo.findOne({ where: { uuid } }), wrapDbError);
   }
 
   findAll(): Promise<Result<Product[], InfrastructureError>> {
-    return fromPromise(this.repo.find(), wrap);
+    return fromPromise(this.repo.find(), wrapDbError);
   }
 
   findByCategoryId(categoryId: number): Promise<Result<Product[], InfrastructureError>> {
-    return fromPromise(this.repo.find({ where: { categoryId } }), wrap);
+    return fromPromise(this.repo.find({ where: { categoryId } }), wrapDbError);
   }
 
   save(entity: Product): Promise<Result<Product, InfrastructureError>> {
-    return fromPromise(this.repo.save(entity), wrap);
+    return fromPromise(this.repo.save(entity), wrapDbError);
   }
 
   async delete(id: number): Promise<Result<boolean, InfrastructureError>> {
     return fromPromise(
       this.repo.delete(id).then((r) => (r.affected ?? 0) > 0),
-      wrap,
+      wrapDbError,
     );
   }
 }

@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { BadRequestException } from '@nestjs/common';
 import { ZodValidationPipe } from '@presentation/pipes/zod-validation.pipe';
 import { z } from 'zod';

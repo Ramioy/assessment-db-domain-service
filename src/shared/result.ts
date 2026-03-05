@@ -28,6 +28,17 @@ export const asyncFlatMap = async <T, U, E>(
   fn: (value: T) => Promise<Result<U, E>>,
 ): Promise<Result<U, E>> => (result.ok ? fn(result.value) : result);
 
+export const fromThrowable = <T, E = Error>(
+  fn: () => T,
+  onThrow: (e: unknown) => E,
+): Result<T, E> => {
+  try {
+    return ok(fn());
+  } catch (e) {
+    return err(onThrow(e));
+  }
+};
+
 export const fromPromise = async <T, E = Error>(
   promise: Promise<T>,
   onReject: (e: unknown) => E,

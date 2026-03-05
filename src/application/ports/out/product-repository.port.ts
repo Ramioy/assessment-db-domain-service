@@ -2,7 +2,7 @@ import type { Result } from '@shared/result';
 import type { InfrastructureError } from '@domain/errors';
 import { Product } from '@domain/models/product.entity';
 
-export interface IProductRepository {
+export interface ProductRepositoryPort {
   findById(id: number): Promise<Result<Product | null, InfrastructureError>>;
   findByUuid(uuid: string): Promise<Result<Product | null, InfrastructureError>>;
   findAll(): Promise<Result<Product[], InfrastructureError>>;

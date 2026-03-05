@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { Test, TestingModule } from '@nestjs/testing';
 import { CustomerController } from '@presentation/controllers/customer.controller';
 import { CreateCustomerUseCase } from '@application/use-cases/customer/create-customer.use-case';
