@@ -1,8 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import {
-  ProductCategory,
-  UpdateProductCategoryDto,
-} from '@domain/models/product-category.entity';
+import { ProductCategory, UpdateProductCategoryDto } from '@domain/models/product-category.entity';
 import { NotFoundException } from '@domain/exceptions/not-found.exception';
 import { IProductCategoryRepository } from '@application/ports/out/product-category-repository.port';
 

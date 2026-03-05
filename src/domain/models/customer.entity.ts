@@ -26,11 +26,9 @@ export class Customer extends BaseEntity {
   address: string | null;
 
   // Relations
-  @ManyToOne(
-    'CustomerDocumentType',
-    (dt: CustomerDocumentType) => dt.customers,
-    { onDelete: 'RESTRICT' },
-  )
+  @ManyToOne('CustomerDocumentType', (dt: CustomerDocumentType) => dt.customers, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'customer_document_type_id' })
   documentType: CustomerDocumentType;
 
@@ -60,6 +58,6 @@ export const createCustomerSchema = customerSchema.omit({
 
 export const updateCustomerSchema = createCustomerSchema.partial();
 
-export type CustomerDto       = z.infer<typeof customerSchema>;
+export type CustomerDto = z.infer<typeof customerSchema>;
 export type CreateCustomerDto = z.infer<typeof createCustomerSchema>;
 export type UpdateCustomerDto = z.infer<typeof updateCustomerSchema>;

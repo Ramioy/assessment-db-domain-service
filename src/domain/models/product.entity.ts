@@ -56,6 +56,6 @@ export const createProductSchema = productSchema.omit({
 
 export const updateProductSchema = createProductSchema.partial();
 
-export type ProductDto       = z.infer<typeof productSchema>;
+export type ProductDto = z.infer<typeof productSchema>;
 export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;

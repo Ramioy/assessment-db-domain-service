@@ -35,6 +35,6 @@ export const createProductCategorySchema = productCategorySchema.omit({
 
 export const updateProductCategorySchema = createProductCategorySchema.partial();
 
-export type ProductCategoryDto       = z.infer<typeof productCategorySchema>;
+export type ProductCategoryDto = z.infer<typeof productCategorySchema>;
 export type CreateProductCategoryDto = z.infer<typeof createProductCategorySchema>;
 export type UpdateProductCategoryDto = z.infer<typeof updateProductCategorySchema>;

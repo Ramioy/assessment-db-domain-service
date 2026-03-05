@@ -33,9 +33,8 @@ export const createTransactionStatusSchema = transactionStatusSchema.omit({
   updatedAt: true,
 });
 
-export const updateTransactionStatusSchema =
-  createTransactionStatusSchema.partial();
+export const updateTransactionStatusSchema = createTransactionStatusSchema.partial();
 
-export type TransactionStatusDto       = z.infer<typeof transactionStatusSchema>;
+export type TransactionStatusDto = z.infer<typeof transactionStatusSchema>;
 export type CreateTransactionStatusDto = z.infer<typeof createTransactionStatusSchema>;
 export type UpdateTransactionStatusDto = z.infer<typeof updateTransactionStatusSchema>;

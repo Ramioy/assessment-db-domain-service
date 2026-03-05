@@ -42,6 +42,6 @@ export const createStockSchema = stockSchema.omit({
 
 export const updateStockSchema = createStockSchema.partial();
 
-export type StockDto       = z.infer<typeof stockSchema>;
+export type StockDto = z.infer<typeof stockSchema>;
 export type CreateStockDto = z.infer<typeof createStockSchema>;
 export type UpdateStockDto = z.infer<typeof updateStockSchema>;

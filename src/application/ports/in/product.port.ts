@@ -1,8 +1,4 @@
-import {
-  Product,
-  CreateProductDto,
-  UpdateProductDto,
-} from '@domain/models/product.entity';
+import { Product, CreateProductDto, UpdateProductDto } from '@domain/models/product.entity';
 
 export interface IProductInputPort {
   create(dto: CreateProductDto): Promise<Product>;

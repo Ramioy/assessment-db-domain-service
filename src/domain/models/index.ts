@@ -15,14 +15,14 @@ export * from './delivery.entity';
 // ─────────────────────────────────────────────
 //  TypeORM DataSource entities array (convenience)
 // ─────────────────────────────────────────────
-import { ProductCategory }      from './product-category.entity';
-import { Product }              from './product.entity';
-import { Stock }                from './stock.entity';
+import { ProductCategory } from './product-category.entity';
+import { Product } from './product.entity';
+import { Stock } from './stock.entity';
 import { CustomerDocumentType } from './customer-document-type.entity';
-import { Customer }             from './customer.entity';
-import { TransactionStatus }    from './transaction-status.entity';
-import { Transaction }          from './transaction.entity';
-import { Delivery }             from './delivery.entity';
+import { Customer } from './customer.entity';
+import { TransactionStatus } from './transaction-status.entity';
+import { Transaction } from './transaction.entity';
+import { Delivery } from './delivery.entity';
 
 export const ALL_ENTITIES = [
   ProductCategory,

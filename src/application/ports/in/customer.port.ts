@@ -1,8 +1,4 @@
-import {
-  Customer,
-  CreateCustomerDto,
-  UpdateCustomerDto,
-} from '@domain/models/customer.entity';
+import { Customer, CreateCustomerDto, UpdateCustomerDto } from '@domain/models/customer.entity';
 
 export interface ICustomerInputPort {
   create(dto: CreateCustomerDto): Promise<Customer>;

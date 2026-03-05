@@ -59,6 +59,6 @@ export const createDeliverySchema = deliverySchema.omit({
 
 export const updateDeliverySchema = createDeliverySchema.partial();
 
-export type DeliveryDto       = z.infer<typeof deliverySchema>;
+export type DeliveryDto = z.infer<typeof deliverySchema>;
 export type CreateDeliveryDto = z.infer<typeof createDeliverySchema>;
 export type UpdateDeliveryDto = z.infer<typeof updateDeliverySchema>;

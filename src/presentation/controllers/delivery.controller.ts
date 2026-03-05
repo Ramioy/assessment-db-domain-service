@@ -26,9 +26,7 @@ export class DeliveryController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(
-    @Body(new ZodValidationPipe(createDeliveryRequestSchema)) dto: CreateDeliveryRequestDto,
-  ) {
+  create(@Body(new ZodValidationPipe(createDeliveryRequestSchema)) dto: CreateDeliveryRequestDto) {
     return this.createUseCase.execute(dto);
   }
 

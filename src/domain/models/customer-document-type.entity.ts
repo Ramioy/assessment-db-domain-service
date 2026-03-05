@@ -33,9 +33,8 @@ export const createCustomerDocumentTypeSchema = customerDocumentTypeSchema.omit(
   updatedAt: true,
 });
 
-export const updateCustomerDocumentTypeSchema =
-  createCustomerDocumentTypeSchema.partial();
+export const updateCustomerDocumentTypeSchema = createCustomerDocumentTypeSchema.partial();
 
-export type CustomerDocumentTypeDto       = z.infer<typeof customerDocumentTypeSchema>;
+export type CustomerDocumentTypeDto = z.infer<typeof customerDocumentTypeSchema>;
 export type CreateCustomerDocumentTypeDto = z.infer<typeof createCustomerDocumentTypeSchema>;
 export type UpdateCustomerDocumentTypeDto = z.infer<typeof updateCustomerDocumentTypeSchema>;

@@ -57,6 +57,6 @@ export const createTransactionSchema = transactionSchema.omit({
 
 export const updateTransactionSchema = createTransactionSchema.partial();
 
-export type TransactionDto       = z.infer<typeof transactionSchema>;
+export type TransactionDto = z.infer<typeof transactionSchema>;
 export type CreateTransactionDto = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionDto = z.infer<typeof updateTransactionSchema>;

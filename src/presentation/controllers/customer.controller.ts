@@ -35,9 +35,7 @@ export class CustomerController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(
-    @Body(new ZodValidationPipe(createCustomerRequestSchema)) dto: CreateCustomerRequestDto,
-  ) {
+  create(@Body(new ZodValidationPipe(createCustomerRequestSchema)) dto: CreateCustomerRequestDto) {
     return this.createUseCase.execute(dto);
   }
 

@@ -11,7 +11,13 @@ export class HealthController {
 
   @Get()
   async check() {
-    const dbReachable = this.dataSource.isInitialized;
+    let dbReachable = false;
+    try {
+      await this.dataSource.query('SELECT 1');
+      dbReachable = true;
+    } catch {
+      dbReachable = false;
+    }
     return {
       status: dbReachable ? 'ok' : 'degraded',
       db: dbReachable ? 'connected' : 'disconnected',
