@@ -1,5 +1,9 @@
-/**
- * Driven Ports (Output Ports)
- * Interfaces that define how the application interacts with external systems
- * These are implemented by Repositories and External Services
- */
+export * from './repository.port';
+export * from './product-category-repository.port';
+export * from './product-repository.port';
+export * from './stock-repository.port';
+export * from './customer-document-type-repository.port';
+export * from './customer-repository.port';
+export * from './transaction-status-repository.port';
+export * from './transaction-repository.port';
+export * from './delivery-repository.port';

@@ -1,5 +1,6 @@
-/**
- * Driving Ports (Input Ports)
- * Interfaces that define how external actors interact with the application
- * These are implemented by Use Cases
- */
+export * from './product-category.port';
+export * from './product.port';
+export * from './stock.port';
+export * from './customer.port';
+export * from './transaction.port';
+export * from './delivery.port';
