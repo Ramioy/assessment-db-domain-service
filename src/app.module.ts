@@ -3,17 +3,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envValidationSchema } from './infrastructure/config/env.validation';
 import { databaseConfig } from './infrastructure/config/database.config';
+import { ProductCategoryModule } from './modules/product-category/product-category.module';
+import { ProductModule } from './modules/product/product.module';
+import { StockModule } from './modules/stock/stock.module';
+import { CustomerModule } from './modules/customer/customer.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
+import { DeliveryModule } from './modules/delivery/delivery.module';
+import { HealthModule } from './modules/health/health.module';
 
-/**
- * App Module - Root NestJS module
- * Wires all layers together (Domain, Application, Infrastructure, Presentation)
- *
- * Hexagonal Architecture Layers:
- * - Domain: Business rules (entities, exceptions, services)
- * - Application: Use cases and orchestration
- * - Infrastructure: Data access, external services, config
- * - Presentation: Controllers and DTOs
- */
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,8 +29,13 @@ import { databaseConfig } from './infrastructure/config/database.config';
       inject: [ConfigService],
       useFactory: databaseConfig,
     }),
+    ProductCategoryModule,
+    ProductModule,
+    StockModule,
+    CustomerModule,
+    TransactionModule,
+    DeliveryModule,
+    HealthModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

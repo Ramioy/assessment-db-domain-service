@@ -1,20 +1,43 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { HttpErrorFilter } from './shared/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
-  // Register global exception filter
+  const config = app.get(ConfigService);
+  const port = config.get<number>('PORT', 3000);
+  const host = config.get<string>('HOST', '0.0.0.0');
+  const apiPrefix = config.get<string>('API_PREFIX', '/api');
+  const apiVersion = config.get<string>('API_VERSION', 'v1');
+  const corsEnabled = config.get<boolean>('CORS_ENABLED', false);
+  const corsOrigin = config.get<string>('CORS_ORIGIN', '');
+
+  // Global API prefix: e.g. /api/v1
+  app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+
+  // CORS via Fastify plugin
+  if (corsEnabled) {
+    const origins = corsOrigin
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
+    await app.register(import('@fastify/cors'), {
+      origin: origins.length > 0 ? origins : true,
+      methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    });
+  }
+
+  // Global exception filter
   app.useGlobalFilters(new HttpErrorFilter());
 
-  // Enable CORS if needed
-  // app.enableCors();
+  // Graceful shutdown
+  app.enableShutdownHooks();
 
-  // Start listening on all interfaces (important for Docker/cloud deployment)
-  await app.listen(3000, '0.0.0.0');
-  console.log(`✓ Application is running on: ${await app.getUrl()}`);
+  await app.listen(port, host);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap().catch((error) => {
