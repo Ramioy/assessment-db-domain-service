@@ -17,6 +17,10 @@ import {
   updateTransactionSchema,
 } from '@domain/models/transaction.entity';
 import { createDeliverySchema } from '@domain/models/delivery.entity';
+import {
+  createPaymentTransactionSchema,
+  updatePaymentTransactionSchema,
+} from '@domain/models/payment-transaction.entity';
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -253,6 +257,147 @@ describe('Delivery Zod schemas', () => {
 
     it('rejects non-positive transactionId', () => {
       expectInvalid(createDeliverySchema, { ...validDelivery, transactionId: -1 });
+    });
+  });
+});
+
+// ── PaymentTransaction ────────────────────────────────────────
+
+describe('PaymentTransaction Zod schemas', () => {
+  const validCreate = {
+    id: '11111111-2222-4333-8444-555555555555',
+    providerId: null,
+    reference: 'ref-order-001',
+    amountInCents: 10000,
+    currency: 'COP',
+    status: 'PENDING',
+    statusMessage: null,
+    paymentMethod: 'CARD',
+    customerEmail: 'customer@example.com',
+    customerIp: null,
+    signature: 'sig-abc123',
+    providerResponse: null,
+  };
+
+  describe('createPaymentTransactionSchema', () => {
+    it('accepts valid full data', () => {
+      expectValid(createPaymentTransactionSchema, validCreate);
+    });
+
+    it('accepts data with providerResponse object', () => {
+      expectValid(createPaymentTransactionSchema, {
+        ...validCreate,
+        providerId: 'prov-123',
+        providerResponse: { code: '200', message: 'OK' },
+      });
+    });
+
+    it('accepts customerIp when provided', () => {
+      expectValid(createPaymentTransactionSchema, { ...validCreate, customerIp: '10.0.0.1' });
+    });
+
+    it('rejects invalid UUID for id', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, id: 'not-a-uuid' });
+    });
+
+    it('rejects empty reference', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, reference: '' });
+    });
+
+    it('rejects reference exceeding 255 chars', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, reference: 'a'.repeat(256) });
+    });
+
+    it('rejects non-positive amountInCents', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, amountInCents: 0 });
+    });
+
+    it('rejects negative amountInCents', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, amountInCents: -100 });
+    });
+
+    it('rejects non-integer amountInCents', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, amountInCents: 10.5 });
+    });
+
+    it('rejects currency not exactly 3 chars', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, currency: 'CO' });
+    });
+
+    it('rejects empty status', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, status: '' });
+    });
+
+    it('rejects empty paymentMethod', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, paymentMethod: '' });
+    });
+
+    it('rejects invalid customerEmail', () => {
+      expectInvalid(createPaymentTransactionSchema, {
+        ...validCreate,
+        customerEmail: 'not-an-email',
+      });
+    });
+
+    it('rejects empty signature', () => {
+      expectInvalid(createPaymentTransactionSchema, { ...validCreate, signature: '' });
+    });
+
+    it('rejects statusMessage exceeding 500 chars', () => {
+      expectInvalid(createPaymentTransactionSchema, {
+        ...validCreate,
+        statusMessage: 'x'.repeat(501),
+      });
+    });
+
+    it('rejects customerIp exceeding 45 chars', () => {
+      expectInvalid(createPaymentTransactionSchema, {
+        ...validCreate,
+        customerIp: 'x'.repeat(46),
+      });
+    });
+  });
+
+  describe('updatePaymentTransactionSchema', () => {
+    it('accepts empty object (all fields optional)', () => {
+      expectValid(updatePaymentTransactionSchema, {});
+    });
+
+    it('accepts status-only update', () => {
+      expectValid(updatePaymentTransactionSchema, { status: 'APPROVED' });
+    });
+
+    it('accepts providerId update', () => {
+      expectValid(updatePaymentTransactionSchema, { providerId: 'prov-xyz' });
+    });
+
+    it('accepts null providerId', () => {
+      expectValid(updatePaymentTransactionSchema, { providerId: null });
+    });
+
+    it('accepts statusMessage update', () => {
+      expectValid(updatePaymentTransactionSchema, { statusMessage: 'Approved' });
+    });
+
+    it('accepts null statusMessage', () => {
+      expectValid(updatePaymentTransactionSchema, { statusMessage: null });
+    });
+
+    it('accepts providerResponse update', () => {
+      expectValid(updatePaymentTransactionSchema, { providerResponse: { code: '200' } });
+    });
+
+    it('accepts full update with all optional fields', () => {
+      expectValid(updatePaymentTransactionSchema, {
+        providerId: 'prov-1',
+        status: 'DECLINED',
+        statusMessage: 'Insufficient funds',
+        providerResponse: { error: 'insufficient_funds' },
+      });
+    });
+
+    it('rejects empty status when provided', () => {
+      expectInvalid(updatePaymentTransactionSchema, { status: '' });
     });
   });
 });

@@ -5,3 +5,4 @@ export * from './customer.controller';
 export * from './transaction.controller';
 export * from './delivery.controller';
 export * from './health.controller';
+export * from './payment-transaction.controller';

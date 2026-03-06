@@ -202,6 +202,53 @@
           "timestamp": { "type": "string", "format": "date-time" },
           "path": { "type": "string" }
         }
+      },
+      "PaymentTransaction": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "providerId": { "type": "string", "nullable": true },
+          "reference": { "type": "string", "example": "ref-order-001" },
+          "amountInCents": { "type": "integer", "example": 10000 },
+          "currency": { "type": "string", "example": "COP", "minLength": 3, "maxLength": 3 },
+          "status": { "type": "string", "example": "PENDING" },
+          "statusMessage": { "type": "string", "nullable": true },
+          "paymentMethod": { "type": "string", "example": "CARD" },
+          "customerEmail": { "type": "string", "format": "email", "example": "customer@example.com" },
+          "customerIp": { "type": "string", "nullable": true, "example": "192.168.1.1" },
+          "signature": { "type": "string", "example": "abc123signaturevalue" },
+          "providerResponse": { "type": "object", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "reference", "amountInCents", "currency", "status", "paymentMethod", "customerEmail", "signature", "createdAt", "updatedAt"]
+      },
+      "CreatePaymentTransactionRequest": {
+        "type": "object",
+        "required": ["id", "reference", "amountInCents", "currency", "paymentMethod", "customerEmail", "signature"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "providerId": { "type": "string", "nullable": true },
+          "reference": { "type": "string", "maxLength": 255, "example": "ref-order-001" },
+          "amountInCents": { "type": "integer", "example": 10000 },
+          "currency": { "type": "string", "minLength": 3, "maxLength": 3, "example": "COP" },
+          "status": { "type": "string", "maxLength": 50, "example": "PENDING" },
+          "statusMessage": { "type": "string", "maxLength": 500, "nullable": true },
+          "paymentMethod": { "type": "string", "maxLength": 50, "example": "CARD" },
+          "customerEmail": { "type": "string", "format": "email", "example": "customer@example.com" },
+          "customerIp": { "type": "string", "maxLength": 45, "nullable": true },
+          "signature": { "type": "string", "maxLength": 128, "example": "abc123signaturevalue" },
+          "providerResponse": { "type": "object", "nullable": true }
+        }
+      },
+      "UpdatePaymentTransactionStatusRequest": {
+        "type": "object",
+        "properties": {
+          "providerId": { "type": "string", "nullable": true },
+          "status": { "type": "string", "example": "APPROVED" },
+          "statusMessage": { "type": "string", "nullable": true },
+          "providerResponse": { "type": "object", "nullable": true }
+        }
       }
     }
   },
@@ -463,6 +510,70 @@
         "summary": "Get a delivery by ID",
         "responses": {
           "200": { "description": "Delivery found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Delivery" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/payment-transactions": {
+      "get": {
+        "tags": ["Payment Transactions"],
+        "summary": "List all payment transactions",
+        "responses": {
+          "200": { "description": "List of payment transactions", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PaymentTransaction" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Payment Transactions"],
+        "summary": "Create a payment transaction",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePaymentTransactionRequest" } } } },
+        "responses": {
+          "201": { "description": "Payment transaction created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentTransaction" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "409": { "description": "Payment transaction with reference already exists", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/payment-transactions/by-reference/{reference}": {
+      "parameters": [{ "name": "reference", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Unique payment reference" }],
+      "get": {
+        "tags": ["Payment Transactions"],
+        "summary": "Get a payment transaction by reference",
+        "responses": {
+          "200": { "description": "Payment transaction found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentTransaction" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/payment-transactions/by-provider-id/{providerId}": {
+      "parameters": [{ "name": "providerId", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Provider-assigned transaction ID" }],
+      "get": {
+        "tags": ["Payment Transactions"],
+        "summary": "Get a payment transaction by provider ID",
+        "responses": {
+          "200": { "description": "Payment transaction found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentTransaction" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/payment-transactions/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+      "get": {
+        "tags": ["Payment Transactions"],
+        "summary": "Get a payment transaction by ID",
+        "responses": {
+          "200": { "description": "Payment transaction found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentTransaction" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/payment-transactions/{id}/status": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+      "patch": {
+        "tags": ["Payment Transactions"],
+        "summary": "Update payment transaction status",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePaymentTransactionStatusRequest" } } } },
+        "responses": {
+          "200": { "description": "Payment transaction status updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentTransaction" } } } },
           "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
         }
       }

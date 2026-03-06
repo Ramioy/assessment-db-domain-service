@@ -12,6 +12,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { HealthModule } from './modules/health/health.module';
+import { PaymentTransactionModule } from './modules/payment-transaction/payment-transaction.module';
 import { DatabaseSeederService } from './infrastructure/config/seeds/database-seeder.service';
 
 @Module({
@@ -39,6 +40,7 @@ import { DatabaseSeederService } from './infrastructure/config/seeds/database-se
     TransactionModule,
     DeliveryModule,
     HealthModule,
+    PaymentTransactionModule,
   ],
   providers: [
     {

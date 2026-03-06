@@ -4,3 +4,4 @@ export * from './stock';
 export * from './customer';
 export * from './transaction';
 export * from './delivery';
+export * from './payment-transaction';

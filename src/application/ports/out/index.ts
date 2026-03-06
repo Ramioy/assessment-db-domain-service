@@ -7,3 +7,4 @@ export * from './customer-repository.port';
 export * from './transaction-status-repository.port';
 export * from './transaction-repository.port';
 export * from './delivery-repository.port';
+export * from './payment-transaction-repository.port';

@@ -10,6 +10,7 @@ import { Customer } from '@domain/models/customer.entity';
 import { TransactionStatus } from '@domain/models/transaction-status.entity';
 import { Transaction } from '@domain/models/transaction.entity';
 import { Delivery } from '@domain/models/delivery.entity';
+import { PaymentTransaction } from '@domain/models/payment-transaction.entity';
 
 /**
  * Standalone TypeORM DataSource used by the TypeORM CLI for migrations.
@@ -35,6 +36,7 @@ export const AppDataSource = new DataSource({
     TransactionStatus,
     Transaction,
     Delivery,
+    PaymentTransaction,
   ],
   migrations: [path.join(__dirname, '../../../migrations/*.{ts,js}')],
   migrationsTableName: 'typeorm_migrations',

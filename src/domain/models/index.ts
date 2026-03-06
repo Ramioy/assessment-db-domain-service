@@ -10,3 +10,4 @@ export * from './customer.entity';
 export * from './transaction-status.entity';
 export * from './transaction.entity';
 export * from './delivery.entity';
+export * from './payment-transaction.entity';

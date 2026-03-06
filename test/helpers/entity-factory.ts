@@ -14,6 +14,7 @@ import { Customer } from '@domain/models/customer.entity';
 import { TransactionStatus } from '@domain/models/transaction-status.entity';
 import { Transaction } from '@domain/models/transaction.entity';
 import { Delivery } from '@domain/models/delivery.entity';
+import { PaymentTransaction } from '@domain/models/payment-transaction.entity';
 
 const NOW = new Date('2024-01-15T10:00:00.000Z');
 
@@ -129,6 +130,30 @@ export function makeDelivery(overrides: Partial<Delivery> = {}): Delivery {
     customerId: 1,
     customerAddressId: null,
     transactionId: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+    ...overrides,
+  });
+}
+
+// ── PaymentTransaction ─────────────────────────────────────────
+
+export function makePaymentTransaction(
+  overrides: Partial<PaymentTransaction> = {},
+): PaymentTransaction {
+  return PaymentTransaction.fromPersistence({
+    id: '11111111-2222-4333-8444-555555555555',
+    providerId: null,
+    reference: 'ref-order-001',
+    amountInCents: 10000,
+    currency: 'COP',
+    status: 'PENDING',
+    statusMessage: null,
+    paymentMethod: 'CARD',
+    customerEmail: 'customer@example.com',
+    customerIp: '192.168.1.1',
+    signature: 'abc123signaturevalue',
+    providerResponse: null,
     createdAt: NOW,
     updatedAt: NOW,
     ...overrides,

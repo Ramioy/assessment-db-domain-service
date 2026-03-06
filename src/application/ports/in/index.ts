@@ -4,3 +4,4 @@ export * from './stock.port';
 export * from './customer.port';
 export * from './transaction.port';
 export * from './delivery.port';
+export * from './payment-transaction.port';

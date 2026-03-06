@@ -41,7 +41,7 @@ Presentation  -->  Application  -->  Domain
 | **Presentation** | `src/presentation/` | HTTP controllers, Zod validation pipes, DTOs, Swagger annotations. |
 | **Shared** | `src/shared/` | Cross-cutting concerns: `Result<T,E>` type, base entity, DI tokens, guards, filters, interceptors. |
 
-Full architectural documentation, including diagrams, boilerplate templates, and best practices, is available in [doc/ARQUITECTURE.md](doc/ARQUITECTURE.md).
+Full architectural documentation, including diagrams, boilerplate templates, and best practices, is available in [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md).
 
 ---
 
@@ -66,7 +66,7 @@ Full architectural documentation, including diagrams, boilerplate templates, and
 
 ![Database Schema](doc/schema/assesstmen-database-schema.png)
 
-The schema consists of eight tables:
+The schema consists of nine tables:
 
 - **product_categories** -- product classification
 - **products** -- catalogue items, each belonging to a category
@@ -76,6 +76,7 @@ The schema consists of eight tables:
 - **transaction_statuses** -- transaction lifecycle states (PENDING, APPROVED, DECLINED, VOIDED, ERROR)
 - **transactions** -- purchase transactions linked to a customer and a status
 - **deliveries** -- shipment records linked to a customer and a transaction
+- **payment_transactions** -- payment gateway transaction records with UUID primary keys, tracking payment status, provider responses, and signatures
 
 ---
 
@@ -223,6 +224,17 @@ When Swagger is enabled, interactive documentation is available at `/docs`.
 | `GET` | `/transactions` | List all transactions (optional `?customerId=` filter) |
 | `GET` | `/transactions/:id` | Get transaction by ID |
 | `PATCH` | `/transactions/:id` | Update a transaction |
+
+### Payment Transactions
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/payment-transactions` | Create a payment transaction (caller-supplied UUID) |
+| `GET` | `/payment-transactions` | List all payment transactions |
+| `GET` | `/payment-transactions/by-reference/:reference` | Get payment transaction by reference |
+| `GET` | `/payment-transactions/by-provider-id/:providerId` | Get payment transaction by provider ID |
+| `GET` | `/payment-transactions/:id` | Get payment transaction by UUID |
+| `PATCH` | `/payment-transactions/:id/status` | Update payment transaction status |
 
 ### Deliveries
 

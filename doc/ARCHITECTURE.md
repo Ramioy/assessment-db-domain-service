@@ -37,6 +37,7 @@ This project implements **Hexagonal Architecture** (also known as **Ports & Adap
 │  - CustomerController        - ProductController            │
 │  - TransactionController     - DeliveryController           │
 │  - ProductCategoryController - StockController              │
+│  - PaymentTransactionController                             │
 │  - HealthController          - ZodValidationPipe            │
 └──────────────────────┬──────────────────────────────────────┘
                        │ (depends on)
@@ -50,6 +51,10 @@ This project implements **Hexagonal Architecture** (also known as **Ports & Adap
 │  │  CreateTransactionUseCase UpdateTransactionUseCase    │  │
 │  │  CreateDeliveryUseCase    FindAllDeliveriesUseCase    │  │
 │  │  UpdateStockUseCase       FindStockByProductUseCase   │  │
+│  │  CreatePaymentTransactionUseCase                      │  │
+│  │  FindPaymentTransactionUseCase                        │  │
+│  │  FindAllPaymentTransactionsUseCase                    │  │
+│  │  UpdatePaymentTransactionUseCase                      │  │
 │  └───────────────────────────────────────────────────────┘  │
 │                                                             │
 │  ┌───────────────────────────────────────────────────────┐  │
@@ -60,6 +65,7 @@ This project implements **Hexagonal Architecture** (also known as **Ports & Adap
 │  │  │ - Commands           │   │ - ICustomerRepo      │  │  │
 │  │  │ - Queries            │   │ - IProductRepo       │  │  │
 │  │  │ - Events             │   │ - ITransactionRepo   │  │  │
+│  │  │                      │   │ - IPaymentTxnRepo   │  │  │
 │  │  └──────────────────────┘   └──────────────────────┘  │  │
 │  └───────────────────────────────────────────────────────┘  │
 └──────────────────────┬──────────────────────────────────────┘
@@ -73,6 +79,7 @@ This project implements **Hexagonal Architecture** (also known as **Ports & Adap
 │  │  ProductCategory (Entity) Stock (Entity)              │  │
 │  │  Transaction (Entity)    TransactionStatus (Entity)   │  │
 │  │  Delivery (Entity)       CustomerDocumentType (Entity)│  │
+│  │  PaymentTransaction (Entity)                          │  │
 │  └───────────────────────────────────────────────────────┘  │
 │                                                             │
 │  ┌───────────────────────────────────────────────────────┐  │
@@ -93,6 +100,7 @@ This project implements **Hexagonal Architecture** (also known as **Ports & Adap
 │ - TransactionRepo │ │ - HttpErrorFilter  │
 │ - DeliveryRepo    │ │ - ApiKeyGuard      │
 │ - StockRepo       │ │ - DI tokens        │
+│ - PaymentTxnRepo  │ │                    │
 │                   │ │                    │
 │ Persistence:      │ └────────────────────┘
 │ - ORM Entities    │
@@ -132,6 +140,7 @@ src/domain/
 │   ├── transaction.entity.ts
 │   ├── transaction-status.entity.ts
 │   ├── delivery.entity.ts
+│   ├── payment-transaction.entity.ts
 │   └── index.ts
 │
 ├── errors/                      # Domain-specific errors
@@ -179,6 +188,7 @@ src/application/
 │   │   ├── stock.port.ts
 │   │   ├── transaction.port.ts
 │   │   ├── delivery.port.ts
+│   │   ├── payment-transaction.port.ts
 │   │   └── index.ts
 │   │
 │   └── out/                                 # Driven Ports (Output)
@@ -191,6 +201,7 @@ src/application/
 │       ├── transaction-repository.port.ts
 │       ├── transaction-status-repository.port.ts
 │       ├── delivery-repository.port.ts
+│       ├── payment-transaction-repository.port.ts
 │       └── index.ts
 │
 ├── use-cases/
@@ -237,6 +248,13 @@ src/application/
 │   │   ├── find-deliveries-by-transaction.use-case.ts
 │   │   └── index.ts
 │   │
+│   ├── payment-transaction/
+│   │   ├── create-payment-transaction.use-case.ts
+│   │   ├── find-payment-transaction.use-case.ts
+│   │   ├── find-all-payment-transactions.use-case.ts
+│   │   ├── update-payment-transaction.use-case.ts
+│   │   └── index.ts
+│   │
 │   └── index.ts
 ```
 
@@ -278,6 +296,7 @@ src/infrastructure/
 │   │   ├── transaction.repository.ts
 │   │   ├── transaction-status.repository.ts
 │   │   ├── delivery.repository.ts
+│   │   ├── payment-transaction.repository.ts
 │   │   └── index.ts
 │   │
 │   └── external/                           # External service adapters (reserved)
@@ -301,6 +320,7 @@ src/infrastructure/
     │   ├── transaction.orm-entity.ts
     │   ├── transaction-status.orm-entity.ts
     │   ├── delivery.orm-entity.ts
+    │   ├── payment-transaction.orm-entity.ts
     │   └── index.ts
     │
     └── mappers/                            # ORM entity <-> Domain entity mappers
@@ -311,7 +331,8 @@ src/infrastructure/
         ├── stock.mapper.ts
         ├── transaction.mapper.ts
         ├── transaction-status.mapper.ts
-        └── delivery.mapper.ts
+        ├── delivery.mapper.ts
+        └── payment-transaction.mapper.ts
 ```
 
 #### Key Characteristics
@@ -375,6 +396,7 @@ src/presentation/
 │   ├── stock.controller.ts
 │   ├── transaction.controller.ts
 │   ├── delivery.controller.ts
+│   ├── payment-transaction.controller.ts
 │   └── index.ts
 │
 ├── dtos/
@@ -388,6 +410,7 @@ src/presentation/
 │   ├── stock/index.ts
 │   ├── transaction/index.ts
 │   ├── delivery/index.ts
+│   ├── payment-transaction/index.ts
 │   └── index.ts
 │
 ├── helpers/

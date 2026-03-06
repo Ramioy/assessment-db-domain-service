@@ -1,7 +1,7 @@
 import type { Result } from '@shared/result';
 import { InfrastructureError } from '@shared/errors';
 
-export const DB_ERROR_CODE = 'DB_QUERY_FAILED' as const;
+export const DB_ERROR_CODE = 'DB_QUERY_FAILED';
 
 export const wrapDbError = (e: unknown) => new InfrastructureError(DB_ERROR_CODE, e);
 

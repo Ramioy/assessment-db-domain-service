@@ -7,4 +7,5 @@ export const DI_TOKENS = {
   TRANSACTION_STATUS_REPOSITORY: 'TransactionStatusRepositoryPort',
   TRANSACTION_REPOSITORY: 'TransactionRepositoryPort',
   DELIVERY_REPOSITORY: 'DeliveryRepositoryPort',
+  PAYMENT_TRANSACTION_REPOSITORY: 'PaymentTransactionRepositoryPort',
 } as const;

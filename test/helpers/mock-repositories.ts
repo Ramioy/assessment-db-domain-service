@@ -18,6 +18,7 @@ import type { CustomerRepositoryPort } from '@application/ports/out/customer-rep
 import type { TransactionStatusRepositoryPort } from '@application/ports/out/transaction-status-repository.port';
 import type { TransactionRepositoryPort } from '@application/ports/out/transaction-repository.port';
 import type { DeliveryRepositoryPort } from '@application/ports/out/delivery-repository.port';
+import type { PaymentTransactionRepositoryPort } from '@application/ports/out/payment-transaction-repository.port';
 
 // Helper type: turn every method into a jest.Mock
 type Mocked<T> = { [K in keyof T]: jest.Mock };
@@ -118,5 +119,17 @@ export function makeMockDeliveryRepository(): Mocked<DeliveryRepositoryPort> {
     findAll: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
+  };
+}
+
+// ── PaymentTransaction ─────────────────────────────────────────
+
+export function makeMockPaymentTransactionRepository(): Mocked<PaymentTransactionRepositoryPort> {
+  return {
+    findById: jest.fn(),
+    findByReference: jest.fn(),
+    findByProviderId: jest.fn(),
+    findAll: jest.fn(),
+    save: jest.fn(),
   };
 }
