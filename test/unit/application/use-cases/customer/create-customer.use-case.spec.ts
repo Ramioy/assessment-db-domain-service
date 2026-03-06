@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { CreateCustomerUseCase } from '@application/use-cases/customer/create-customer.use-case';
 import { NotFoundError, AlreadyExistsError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import {
   makeMockCustomerRepository,
   makeMockCustomerDocumentTypeRepository,
@@ -88,6 +89,42 @@ describe('CreateCustomerUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBeInstanceOf(AlreadyExistsError);
+    expect(customerRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from docTypeRepo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    docTypeRepo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(customerRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from customerRepo.findByEmail', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    docTypeRepo.findById.mockResolvedValue(ok(makeCustomerDocumentType({ id: 1 })));
+    customerRepo.findByEmail.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(customerRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from customerRepo.findByDocumentNumber', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    docTypeRepo.findById.mockResolvedValue(ok(makeCustomerDocumentType({ id: 1 })));
+    customerRepo.findByEmail.mockResolvedValue(ok(null));
+    customerRepo.findByDocumentNumber.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
     expect(customerRepo.save).not.toHaveBeenCalled();
   });
 });

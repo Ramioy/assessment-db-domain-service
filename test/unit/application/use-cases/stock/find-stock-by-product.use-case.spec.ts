@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { FindStockByProductUseCase } from '@application/use-cases/stock/find-stock-by-product.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockStockRepository } from '../../../../helpers/mock-repositories';
 import { makeStock } from '../../../../helpers/entity-factory';
 
@@ -42,5 +43,15 @@ describe('FindStockByProductUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('Stock for product with id 99 not found');
+  });
+
+  it('propagates infrastructure error from repo.findByProductId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByProductId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

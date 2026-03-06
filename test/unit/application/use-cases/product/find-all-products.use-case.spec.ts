@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-disable */
 import { FindAllProductsUseCase } from '@application/use-cases/product/find-all-products.use-case';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockProductRepository } from '../../../../helpers/mock-repositories';
 import { makeProduct } from '../../../../helpers/entity-factory';
 
@@ -45,5 +46,25 @@ describe('FindAllProductsUseCase', () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toEqual([]);
+  });
+
+  it('propagates infrastructure error from repo.findAll', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findAll.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+  });
+
+  it('propagates infrastructure error from repo.findByCategoryId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByCategoryId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(3);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

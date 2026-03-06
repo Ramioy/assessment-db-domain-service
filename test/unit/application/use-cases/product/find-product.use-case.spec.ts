@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { FindProductUseCase } from '@application/use-cases/product/find-product.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockProductRepository } from '../../../../helpers/mock-repositories';
 import { makeProduct } from '../../../../helpers/entity-factory';
 
@@ -42,5 +43,15 @@ describe('FindProductUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('Product with id 99 not found');
+  });
+
+  it('propagates infrastructure error from repo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

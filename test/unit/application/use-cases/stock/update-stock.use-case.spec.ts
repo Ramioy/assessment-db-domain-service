@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { UpdateStockUseCase } from '@application/use-cases/stock/update-stock.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockStockRepository } from '../../../../helpers/mock-repositories';
 import { makeStock } from '../../../../helpers/entity-factory';
 
@@ -52,6 +53,17 @@ describe('UpdateStockUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
+    expect(repo.save).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from repo.findByProductId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByProductId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1, {});
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
     expect(repo.save).not.toHaveBeenCalled();
   });
 });

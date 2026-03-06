@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { CreateProductUseCase } from '@application/use-cases/product/create-product.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import {
   makeMockProductRepository,
   makeMockProductCategoryRepository,
@@ -52,5 +53,16 @@ describe('CreateProductUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('ProductCategory with id 1 not found');
+  });
+
+  it('propagates infrastructure error from categoryRepo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    categoryRepo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(productRepo.save).not.toHaveBeenCalled();
   });
 });

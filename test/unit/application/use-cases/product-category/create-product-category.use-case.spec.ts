@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { CreateProductCategoryUseCase } from '@application/use-cases/product-category/create-product-category.use-case';
 import { AlreadyExistsError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockProductCategoryRepository } from '../../../../helpers/mock-repositories';
 import { makeProductCategory } from '../../../../helpers/entity-factory';
 
@@ -50,5 +51,16 @@ describe('CreateProductCategoryUseCase', () => {
     if (!result.ok) {
       expect(result.error.message).toBe("ProductCategory with name 'Electronics' already exists");
     }
+  });
+
+  it('propagates infrastructure error from repo.findByName', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByName.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute({ name: 'Electronics' });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(repo.save).not.toHaveBeenCalled();
   });
 });

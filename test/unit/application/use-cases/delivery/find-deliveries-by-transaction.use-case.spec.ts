@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { FindDeliveriesByTransactionUseCase } from '@application/use-cases/delivery/find-deliveries-by-transaction.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import {
   makeMockDeliveryRepository,
   makeMockTransactionRepository,
@@ -51,5 +52,16 @@ describe('FindDeliveriesByTransactionUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('Transaction with id 99 not found');
+  });
+
+  it('propagates infrastructure error from transactionRepo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    transactionRepo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(10);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(deliveryRepo.findByTransactionId).not.toHaveBeenCalled();
   });
 });

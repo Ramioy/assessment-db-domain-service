@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-disable */
 import { FindAllTransactionsUseCase } from '@application/use-cases/transaction/find-all-transactions.use-case';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockTransactionRepository } from '../../../../helpers/mock-repositories';
 import { makeTransaction } from '../../../../helpers/entity-factory';
 
@@ -36,5 +37,25 @@ describe('FindAllTransactionsUseCase', () => {
     expect(repo.findAll).not.toHaveBeenCalled();
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toEqual(txs);
+  });
+
+  it('propagates infrastructure error from repo.findAll', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findAll.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+  });
+
+  it('propagates infrastructure error from repo.findByCustomerId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByCustomerId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(3);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

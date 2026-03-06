@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { FindTransactionUseCase } from '@application/use-cases/transaction/find-transaction.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockTransactionRepository } from '../../../../helpers/mock-repositories';
 import { makeTransaction } from '../../../../helpers/entity-factory';
 
@@ -42,5 +43,15 @@ describe('FindTransactionUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('Transaction with id 5 not found');
+  });
+
+  it('propagates infrastructure error from repo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

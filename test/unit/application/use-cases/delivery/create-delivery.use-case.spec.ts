@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { CreateDeliveryUseCase } from '@application/use-cases/delivery/create-delivery.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import {
   makeMockDeliveryRepository,
   makeMockCustomerRepository,
@@ -78,5 +79,28 @@ describe('CreateDeliveryUseCase', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toBe('Transaction with id 1 not found');
+  });
+
+  it('propagates infrastructure error from customerRepo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    customerRepo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(deliveryRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from transactionRepo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    customerRepo.findById.mockResolvedValue(ok(makeCustomer({ id: 1 })));
+    transactionRepo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(dto);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(deliveryRepo.save).not.toHaveBeenCalled();
   });
 });

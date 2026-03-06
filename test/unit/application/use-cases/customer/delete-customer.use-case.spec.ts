@@ -2,7 +2,8 @@
 /* eslint-disable */
 import { DeleteCustomerUseCase } from '@application/use-cases/customer/delete-customer.use-case';
 import { NotFoundError } from '@domain/errors';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockCustomerRepository } from '../../../../helpers/mock-repositories';
 import { makeCustomer } from '../../../../helpers/entity-factory';
 
@@ -34,5 +35,27 @@ describe('DeleteCustomerUseCase', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBeInstanceOf(NotFoundError);
     expect(repo.delete).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from repo.findById', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findById.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+    expect(repo.delete).not.toHaveBeenCalled();
+  });
+
+  it('propagates infrastructure error from repo.delete', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findById.mockResolvedValue(ok(makeCustomer({ id: 1 })));
+    repo.delete.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(1);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

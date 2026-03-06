@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-disable */
 import { FindAllDeliveriesUseCase } from '@application/use-cases/delivery/find-all-deliveries.use-case';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockDeliveryRepository } from '../../../../helpers/mock-repositories';
 import { makeDelivery } from '../../../../helpers/entity-factory';
 
@@ -49,5 +50,35 @@ describe('FindAllDeliveriesUseCase', () => {
     expect(repo.findAll).not.toHaveBeenCalled();
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toEqual(deliveries);
+  });
+
+  it('propagates infrastructure error from repo.findAll', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findAll.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+  });
+
+  it('propagates infrastructure error from repo.findByTransactionId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByTransactionId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(5);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
+  });
+
+  it('propagates infrastructure error from repo.findByCustomerId', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findByCustomerId.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute(undefined, 3);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });

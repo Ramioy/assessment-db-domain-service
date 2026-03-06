@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-disable */
 import { FindAllCustomersUseCase } from '@application/use-cases/customer/find-all-customers.use-case';
-import { ok } from '@shared/result';
+import { InfrastructureError } from '@shared/errors';
+import { ok, err } from '@shared/result';
 import { makeMockCustomerRepository } from '../../../../helpers/mock-repositories';
 import { makeCustomer } from '../../../../helpers/entity-factory';
 
@@ -35,5 +36,15 @@ describe('FindAllCustomersUseCase', () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toEqual([]);
+  });
+
+  it('propagates infrastructure error from repo.findAll', async () => {
+    const dbError = new InfrastructureError('DB failure');
+    repo.findAll.mockResolvedValue(err(dbError));
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe(dbError);
   });
 });
