@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { DeleteProductUseCase } from '@application/use-cases/product/delete-product.use-case';
 import { NotFoundError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';

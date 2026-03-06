@@ -43,7 +43,9 @@ describe('ApiKeyGuard', () => {
   });
 
   it('allows request when valid API key is provided in x-api-key header', () => {
-    configService.get.mockImplementation((key: string) => key === 'API_KEY_ENABLED' ? true : 'secret-key');
+    configService.get.mockImplementation((key: string) =>
+      key === 'API_KEY_ENABLED' ? true : 'secret-key',
+    );
     reflector.getAllAndOverride.mockReturnValue(false);
     const context = makeContext({ 'x-api-key': 'secret-key' });
 
@@ -57,14 +59,20 @@ describe('ApiKeyGuard', () => {
     reflector.getAllAndOverride.mockReturnValue(false);
     const context = makeContext({});
 
-    expect(() => guard.canActivate(context as any)).toThrow(new UnauthorizedException('Invalid or missing API key'));
+    expect(() => guard.canActivate(context as any)).toThrow(
+      new UnauthorizedException('Invalid or missing API key'),
+    );
   });
 
   it('throws UnauthorizedException when API key is invalid', () => {
-    configService.get.mockImplementation((key: string) => key === 'API_KEY_ENABLED' ? true : 'secret-key');
+    configService.get.mockImplementation((key: string) =>
+      key === 'API_KEY_ENABLED' ? true : 'secret-key',
+    );
     reflector.getAllAndOverride.mockReturnValue(false);
     const context = makeContext({ 'x-api-key': 'wrong-key' });
 
-    expect(() => guard.canActivate(context as any)).toThrow(new UnauthorizedException('Invalid or missing API key'));
+    expect(() => guard.canActivate(context as any)).toThrow(
+      new UnauthorizedException('Invalid or missing API key'),
+    );
   });
 });

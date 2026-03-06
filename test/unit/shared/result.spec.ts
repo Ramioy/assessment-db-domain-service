@@ -146,7 +146,9 @@ describe('Result utilities', () => {
     it('returns err when fn throws', () => {
       const mapped = new Error('caught');
       const result = fromThrowable(
-        () => { throw new Error('boom'); },
+        () => {
+          throw new Error('boom');
+        },
         (_) => mapped,
       );
       expect(result.ok).toBe(false);
@@ -156,20 +158,14 @@ describe('Result utilities', () => {
 
   describe('fromPromise()', () => {
     it('returns ok when promise resolves', async () => {
-      const result = await fromPromise(
-        Promise.resolve(99),
-        (e) => new Error(String(e)),
-      );
+      const result = await fromPromise(Promise.resolve(99), (e) => new Error(String(e)));
       expect(result.ok).toBe(true);
       if (result.ok) expect(result.value).toBe(99);
     });
 
     it('returns err when promise rejects', async () => {
       const mapped = new Error('rejected');
-      const result = await fromPromise(
-        Promise.reject(new Error('boom')),
-        (_) => mapped,
-      );
+      const result = await fromPromise(Promise.reject(new Error('boom')), (_) => mapped);
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.error).toBe(mapped);
     });

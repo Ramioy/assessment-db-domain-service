@@ -47,7 +47,9 @@ describe('LoggingInterceptor', () => {
     interceptor.intercept(context as any, next as any).subscribe({
       error: (err) => {
         expect(err).toBe(error);
-        expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/POST \/api\/fail ERROR - \d+ms/));
+        expect(errorSpy).toHaveBeenCalledWith(
+          expect.stringMatching(/POST \/api\/fail ERROR - \d+ms/),
+        );
         done();
       },
     });

@@ -27,7 +27,7 @@ export class DeliveryOrmEntity {
   @Column({ name: 'customer_id' })
   customerId: number;
 
-  @Column({ name: 'customer_address_id', nullable: true })
+  @Column({ name: 'customer_address_id', type: 'int', nullable: true })
   customerAddressId: number | null;
 
   @Column({ name: 'transaction_id' })

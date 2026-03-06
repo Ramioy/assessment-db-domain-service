@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { ProductCategory } from '@domain/models/product-category.entity';
 import { makeProductCategory } from '../../../helpers/entity-factory';
 

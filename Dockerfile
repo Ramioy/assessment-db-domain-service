@@ -26,8 +26,11 @@ COPY --from=builder /app/dist ./dist
 # Copy environment example files (actual .env should be mounted or injected)
 COPY environment/ environment/
 
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh
+
 USER appuser
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["./docker-entrypoint.sh"]

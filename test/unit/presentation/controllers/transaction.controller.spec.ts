@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionController } from '@presentation/controllers/transaction.controller';
 import { CreateTransactionUseCase } from '@application/use-cases/transaction/create-transaction.use-case';

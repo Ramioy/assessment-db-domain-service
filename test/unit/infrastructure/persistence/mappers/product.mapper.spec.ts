@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { ProductMapper } from '@infrastructure/persistence/mappers/product.mapper';
 import { ProductOrmEntity } from '@infrastructure/persistence/entities/product.orm-entity';
 import { Product } from '@domain/models/product.entity';

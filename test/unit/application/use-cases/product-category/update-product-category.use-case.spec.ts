@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { UpdateProductCategoryUseCase } from '@application/use-cases/product-category/update-product-category.use-case';
 import { NotFoundError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';

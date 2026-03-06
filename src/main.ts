@@ -16,6 +16,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT', 3000);
   const host = config.get<string>('HOST', '0.0.0.0');
+  const nodeEnv = config.get<string>('NODE_ENV', 'development');
   const apiPrefix = config.get<string>('API_PREFIX', '/api');
   const apiVersion = config.get<string>('API_VERSION', 'v1');
   const corsEnabled = config.get<boolean>('CORS_ENABLED', false);
@@ -24,8 +25,8 @@ async function bootstrap() {
   const appName = config.get<string>('APP_NAME', 'assessment-db-domain-service');
   const appDescription = config.get<string>('APP_DESCRIPTION', 'Database domain backend service');
 
-  // Global API prefix: e.g. /api/v1
-  app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+  // Global API prefix: e.g. /api/development/v1
+  app.setGlobalPrefix(`${apiPrefix}/${nodeEnv}/${apiVersion}`);
 
   // Helmet security headers
   await app.register(import('@fastify/helmet'), {

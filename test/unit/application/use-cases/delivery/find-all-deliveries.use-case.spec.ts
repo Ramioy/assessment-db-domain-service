@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { FindAllDeliveriesUseCase } from '@application/use-cases/delivery/find-all-deliveries.use-case';
 import { InfrastructureError } from '@shared/errors';
 import { ok, err } from '@shared/result';

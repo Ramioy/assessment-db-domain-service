@@ -1,3 +1,4 @@
+name: assessment-prod
 services:
   postgres:
     image: postgres:16-alpine
@@ -7,10 +8,10 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-    ports:
-      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - assessment-production
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
@@ -26,21 +27,27 @@ services:
     env_file:
       - .env
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:${PORT:-3000}"
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/v1/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:${PORT:-3000}${API_PREFIX:-/api}/${NODE_ENV:-production}/${API_VERSION:-v1}/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 15s
+    networks:
+      - assessment-production
     deploy:
       resources:
         limits:
           memory: 512M
           cpus: "0.5"
 
+networks:
+  assessment-production:
+    name: assessment-production
+
 volumes:
-  postgres_data:
+  postgres_data_prod:

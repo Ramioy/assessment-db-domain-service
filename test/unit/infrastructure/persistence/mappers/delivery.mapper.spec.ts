@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { DeliveryMapper } from '@infrastructure/persistence/mappers/delivery.mapper';
 import { DeliveryOrmEntity } from '@infrastructure/persistence/entities/delivery.orm-entity';
 import { Delivery } from '@domain/models/delivery.entity';

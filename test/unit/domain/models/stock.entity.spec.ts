@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { Stock } from '@domain/models/stock.entity';
 import { InsufficientStockError } from '@domain/errors';
 import { makeStock } from '../../../helpers/entity-factory';

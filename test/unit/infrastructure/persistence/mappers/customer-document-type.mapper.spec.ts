@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CustomerDocumentTypeMapper } from '@infrastructure/persistence/mappers/customer-document-type.mapper';
 import { CustomerDocumentTypeOrmEntity } from '@infrastructure/persistence/entities/customer-document-type.orm-entity';
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';

@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { FindAllProductCategoriesUseCase } from '@application/use-cases/product-category/find-all-product-categories.use-case';
 import { InfrastructureError } from '@shared/errors';
 import { ok, err } from '@shared/result';

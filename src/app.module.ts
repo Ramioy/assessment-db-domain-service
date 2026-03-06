@@ -12,6 +12,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { HealthModule } from './modules/health/health.module';
+import { DatabaseSeederService } from './infrastructure/config/seeds/database-seeder.service';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { HealthModule } from './modules/health/health.module';
       provide: APP_GUARD,
       useClass: ApiKeyGuard,
     },
+    DatabaseSeederService,
   ],
 })
 export class AppModule {}

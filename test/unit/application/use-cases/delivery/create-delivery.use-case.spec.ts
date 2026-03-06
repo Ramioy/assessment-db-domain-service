@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CreateDeliveryUseCase } from '@application/use-cases/delivery/create-delivery.use-case';
 import { NotFoundError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';

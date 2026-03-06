@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CreateTransactionUseCase } from '@application/use-cases/transaction/create-transaction.use-case';
 import { NotFoundError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';

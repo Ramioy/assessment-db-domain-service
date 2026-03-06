@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { Product } from '@domain/models/product.entity';
 import { makeProduct } from '../../../helpers/entity-factory';
 

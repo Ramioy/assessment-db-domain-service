@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { StockController } from '@presentation/controllers/stock.controller';
 import { FindStockByProductUseCase } from '@application/use-cases/stock/find-stock-by-product.use-case';

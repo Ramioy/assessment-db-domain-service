@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { StockMapper } from '@infrastructure/persistence/mappers/stock.mapper';
 import { StockOrmEntity } from '@infrastructure/persistence/entities/stock.orm-entity';
 import { Stock } from '@domain/models/stock.entity';

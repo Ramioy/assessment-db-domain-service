@@ -43,4 +43,10 @@ export default [
       '@typescript-eslint/no-unsafe-return': 'warn',
     },
   },
+  {
+    files: ['test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/ban-ts-comment': 'off',
+    },
+  },
 ];

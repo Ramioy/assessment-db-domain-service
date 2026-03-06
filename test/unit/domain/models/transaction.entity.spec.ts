@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { Transaction } from '@domain/models/transaction.entity';
 import { makeTransaction } from '../../../helpers/entity-factory';
 

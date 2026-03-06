@@ -1,6 +1,6 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -13,12 +13,12 @@ export class LoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
-        const response = context.switchToHttp().getResponse();
+        const response = context.switchToHttp().getResponse<FastifyReply>();
         const statusCode = response.statusCode;
         const elapsed = Date.now() - now;
         this.logger.log(`${method} ${url} ${statusCode} - ${elapsed}ms`);
       }),
-      catchError((error) => {
+      catchError((error: Error) => {
         const elapsed = Date.now() - now;
         this.logger.error(`${method} ${url} ERROR - ${elapsed}ms`);
         return throwError(() => error);

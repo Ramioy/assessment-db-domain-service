@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
 import { makeCustomerDocumentType } from '../../../helpers/entity-factory';
 
@@ -8,7 +8,10 @@ describe('CustomerDocumentType', () => {
 
   describe('create()', () => {
     it('returns a CustomerDocumentType with correct fields and id=0', () => {
-      const entity = CustomerDocumentType.create({ name: 'Passport', description: 'Travel document' });
+      const entity = CustomerDocumentType.create({
+        name: 'Passport',
+        description: 'Travel document',
+      });
 
       expect(entity.id).toBe(0);
       expect(entity.name).toBe('Passport');

@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { toApiResponse } from '@presentation/dtos/common/api-response.dto';
 
 describe('toApiResponse', () => {

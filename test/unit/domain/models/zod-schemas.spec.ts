@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 /**
  * Zod Schema tests – validates that domain model schemas accept
  * valid data and reject invalid data with proper error shapes.

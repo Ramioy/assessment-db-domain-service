@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { bootstrapTestApp } from './app-bootstrap';
 

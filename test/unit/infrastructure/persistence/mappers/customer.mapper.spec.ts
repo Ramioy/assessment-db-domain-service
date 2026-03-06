@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CustomerMapper } from '@infrastructure/persistence/mappers/customer.mapper';
 import { CustomerOrmEntity } from '@infrastructure/persistence/entities/customer.orm-entity';
 import { Customer } from '@domain/models/customer.entity';

@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { FindAllTransactionsUseCase } from '@application/use-cases/transaction/find-all-transactions.use-case';
 import { InfrastructureError } from '@shared/errors';
 import { ok, err } from '@shared/result';

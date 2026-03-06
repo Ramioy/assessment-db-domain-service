@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { TransactionStatus } from '@domain/models/transaction-status.entity';
 import { makeTransactionStatus } from '../../../helpers/entity-factory';
 
@@ -8,7 +8,10 @@ describe('TransactionStatus', () => {
 
   describe('create()', () => {
     it('returns a TransactionStatus with correct fields and id=0', () => {
-      const entity = TransactionStatus.create({ name: 'PENDING', description: 'Awaiting processing' });
+      const entity = TransactionStatus.create({
+        name: 'PENDING',
+        description: 'Awaiting processing',
+      });
 
       expect(entity.id).toBe(0);
       expect(entity.name).toBe('PENDING');

@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { TransactionMapper } from '@infrastructure/persistence/mappers/transaction.mapper';
 import { TransactionOrmEntity } from '@infrastructure/persistence/entities/transaction.orm-entity';
 import { Transaction } from '@domain/models/transaction.entity';

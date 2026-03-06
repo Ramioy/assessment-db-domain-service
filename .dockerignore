@@ -49,13 +49,10 @@ CHANGELOG.md
 LICENSE
 
 # Configuration files (not needed in container)
-tsconfig.json
-tsconfig.build.json
 .eslintrc.js
 .prettierrc
 eslint.config.mjs
 jest.config.js
-nest-cli.json
 
 # Docker and CI/CD
 Dockerfile

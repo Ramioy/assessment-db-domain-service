@@ -1,0 +1,471 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "assessment-db-domain-service",
+    "description": "Database domain backend service — Hexagonal Architecture with NestJS + Fastify + PostgreSQL",
+    "version": "1.0.0",
+    "license": { "name": "GPL-3.0-only" }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/development/v1",
+      "description": "Local development"
+    },
+    {
+      "url": "http://localhost:3000/api/production/v1",
+      "description": "Local production"
+    }
+  ],
+  "security": [{ "ApiKeyAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "customerDocumentTypeId": { "type": "integer", "example": 1 },
+          "documentNumber": { "type": "string", "example": "1234567890" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "contactPhone": { "type": "string", "nullable": true, "example": "+57 300 000 0000" },
+          "address": { "type": "string", "nullable": true, "example": "Calle 1 #2-3" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "customerDocumentTypeId", "documentNumber", "email", "createdAt", "updatedAt"]
+      },
+      "CreateCustomerRequest": {
+        "type": "object",
+        "required": ["customerDocumentTypeId", "documentNumber", "email"],
+        "properties": {
+          "customerDocumentTypeId": { "type": "integer", "example": 1 },
+          "documentNumber": { "type": "string", "maxLength": 50, "example": "1234567890" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "contactPhone": { "type": "string", "maxLength": 30, "nullable": true },
+          "address": { "type": "string", "nullable": true }
+        }
+      },
+      "UpdateCustomerRequest": {
+        "type": "object",
+        "properties": {
+          "contactPhone": { "type": "string", "maxLength": 30, "nullable": true },
+          "address": { "type": "string", "nullable": true }
+        }
+      },
+      "ProductCategory": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Electronics" },
+          "description": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "name", "createdAt", "updatedAt"]
+      },
+      "CreateProductCategoryRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "example": "Electronics" },
+          "description": { "type": "string", "nullable": true }
+        }
+      },
+      "UpdateProductCategoryRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Laptop" },
+          "description": { "type": "string", "nullable": true },
+          "imageUrl": { "type": "string", "nullable": true },
+          "categoryId": { "type": "integer", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "name", "categoryId", "createdAt", "updatedAt"]
+      },
+      "CreateProductRequest": {
+        "type": "object",
+        "required": ["name", "categoryId"],
+        "properties": {
+          "name": { "type": "string", "example": "Laptop" },
+          "description": { "type": "string", "nullable": true },
+          "imageUrl": { "type": "string", "nullable": true },
+          "categoryId": { "type": "integer", "example": 1 }
+        }
+      },
+      "UpdateProductRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "imageUrl": { "type": "string", "nullable": true },
+          "categoryId": { "type": "integer" }
+        }
+      },
+      "Stock": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "productId": { "type": "integer", "example": 1 },
+          "quantity": { "type": "integer", "example": 100 },
+          "description": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "productId", "quantity", "createdAt", "updatedAt"]
+      },
+      "UpdateStockRequest": {
+        "type": "object",
+        "properties": {
+          "quantity": { "type": "integer", "minimum": 0 },
+          "description": { "type": "string", "nullable": true }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "customerId": { "type": "integer", "example": 1 },
+          "cut": { "type": "string", "nullable": true, "example": "CUT-001" },
+          "transactionStatusId": { "type": "integer", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "customerId", "transactionStatusId", "createdAt", "updatedAt"]
+      },
+      "CreateTransactionRequest": {
+        "type": "object",
+        "required": ["customerId", "transactionStatusId"],
+        "properties": {
+          "customerId": { "type": "integer", "example": 1 },
+          "cut": { "type": "string", "nullable": true, "example": "CUT-001" },
+          "transactionStatusId": { "type": "integer", "example": 1 }
+        }
+      },
+      "UpdateTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "customerId": { "type": "integer" },
+          "cut": { "type": "string", "nullable": true },
+          "transactionStatusId": { "type": "integer" }
+        }
+      },
+      "Delivery": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "customerId": { "type": "integer", "example": 1 },
+          "customerAddressId": { "type": "integer", "nullable": true },
+          "transactionId": { "type": "integer", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "customerId", "transactionId", "createdAt", "updatedAt"]
+      },
+      "CreateDeliveryRequest": {
+        "type": "object",
+        "required": ["customerId", "transactionId"],
+        "properties": {
+          "customerId": { "type": "integer", "example": 1 },
+          "customerAddressId": { "type": "integer", "nullable": true },
+          "transactionId": { "type": "integer", "example": 1 }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["ok", "degraded"] },
+          "db": { "type": "string", "enum": ["connected", "disconnected"] },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["status", "db", "timestamp"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": { "type": "integer" },
+          "message": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "path": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns service and database health status. Public — no API key required.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthResponse" },
+                "example": { "status": "ok", "db": "connected", "timestamp": "2026-03-05T00:00:00.000Z" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "tags": ["Customers"],
+        "summary": "List all customers",
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Customer" } } } }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "summary": "Create a customer",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateCustomerRequest" } } } },
+        "responses": {
+          "201": { "description": "Customer created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Customer" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "409": { "description": "Customer already exists", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/customers/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Customers"],
+        "summary": "Get a customer by ID",
+        "responses": {
+          "200": { "description": "Customer found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Customer" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "patch": {
+        "tags": ["Customers"],
+        "summary": "Update a customer",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateCustomerRequest" } } } },
+        "responses": {
+          "200": { "description": "Customer updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Customer" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Customers"],
+        "summary": "Delete a customer",
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/product-categories": {
+      "get": {
+        "tags": ["Product Categories"],
+        "summary": "List all product categories",
+        "responses": {
+          "200": { "description": "List of categories", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ProductCategory" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Product Categories"],
+        "summary": "Create a product category",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateProductCategoryRequest" } } } },
+        "responses": {
+          "201": { "description": "Category created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductCategory" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "409": { "description": "Category already exists", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/product-categories/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Product Categories"],
+        "summary": "Get a product category by ID",
+        "responses": {
+          "200": { "description": "Category found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductCategory" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "patch": {
+        "tags": ["Product Categories"],
+        "summary": "Update a product category",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateProductCategoryRequest" } } } },
+        "responses": {
+          "200": { "description": "Category updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductCategory" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Product Categories"],
+        "summary": "Delete a product category",
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List all products",
+        "parameters": [
+          { "name": "categoryId", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "Filter by category ID" }
+        ],
+        "responses": {
+          "200": { "description": "List of products", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create a product",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateProductRequest" } } } },
+        "responses": {
+          "201": { "description": "Product created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Category not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/products/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get a product by ID",
+        "responses": {
+          "200": { "description": "Product found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "patch": {
+        "tags": ["Products"],
+        "summary": "Update a product",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateProductRequest" } } } },
+        "responses": {
+          "200": { "description": "Product updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete a product",
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/products/{productId}/stock": {
+      "parameters": [{ "name": "productId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Stock"],
+        "summary": "Get stock by product ID",
+        "responses": {
+          "200": { "description": "Stock found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Stock" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "patch": {
+        "tags": ["Stock"],
+        "summary": "Update stock for a product",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateStockRequest" } } } },
+        "responses": {
+          "200": { "description": "Stock updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Stock" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "List all transactions",
+        "parameters": [
+          { "name": "customerId", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "Filter by customer ID" }
+        ],
+        "responses": {
+          "200": { "description": "List of transactions", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Transaction" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Transactions"],
+        "summary": "Create a transaction",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTransactionRequest" } } } },
+        "responses": {
+          "201": { "description": "Transaction created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Transaction" } } } },
+          "400": { "description": "Validation error or invalid transaction", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/transactions/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get a transaction by ID",
+        "responses": {
+          "200": { "description": "Transaction found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Transaction" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      },
+      "patch": {
+        "tags": ["Transactions"],
+        "summary": "Update a transaction status",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateTransactionRequest" } } } },
+        "responses": {
+          "200": { "description": "Transaction updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Transaction" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/deliveries": {
+      "get": {
+        "tags": ["Deliveries"],
+        "summary": "List all deliveries",
+        "parameters": [
+          { "name": "transactionId", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "Filter by transaction ID" },
+          { "name": "customerId", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "Filter by customer ID" }
+        ],
+        "responses": {
+          "200": { "description": "List of deliveries", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Delivery" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Deliveries"],
+        "summary": "Create a delivery",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateDeliveryRequest" } } } },
+        "responses": {
+          "201": { "description": "Delivery created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Delivery" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Customer or Transaction not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/deliveries/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Deliveries"],
+        "summary": "Get a delivery by ID",
+        "responses": {
+          "200": { "description": "Delivery found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Delivery" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    }
+  }
+}

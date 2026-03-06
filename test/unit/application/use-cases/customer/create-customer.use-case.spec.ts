@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { CreateCustomerUseCase } from '@application/use-cases/customer/create-customer.use-case';
 import { NotFoundError, AlreadyExistsError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';

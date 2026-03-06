@@ -49,4 +49,4 @@ async function seed(): Promise<void> {
   }
 }
 
-seed();
+void seed();

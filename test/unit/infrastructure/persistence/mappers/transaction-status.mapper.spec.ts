@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { TransactionStatusMapper } from '@infrastructure/persistence/mappers/transaction-status.mapper';
 import { TransactionStatusOrmEntity } from '@infrastructure/persistence/entities/transaction-status.orm-entity';
 import { TransactionStatus } from '@domain/models/transaction-status.entity';

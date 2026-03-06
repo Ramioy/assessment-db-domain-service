@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 import { DeleteCustomerUseCase } from '@application/use-cases/customer/delete-customer.use-case';
 import { NotFoundError } from '@domain/errors';
 import { InfrastructureError } from '@shared/errors';
