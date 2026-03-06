@@ -3,36 +3,43 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '@domain/models/product.entity';
 import { ProductRepositoryPort } from '@application/ports/out/product-repository.port';
-import { fromPromise, type Result } from '@shared/result';
-
+import { fromPromise, map, type Result } from '@shared/result';
+import { ProductOrmEntity } from '@infrastructure/persistence/entities/product.orm-entity';
+import { ProductMapper } from '@infrastructure/persistence/mappers/product.mapper';
 import { wrapDbError } from './base.repository';
 import type { InfrastructureError } from '@shared/errors';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryPort {
   constructor(
-    @InjectRepository(Product)
-    private readonly repo: Repository<Product>,
+    @InjectRepository(ProductOrmEntity)
+    private readonly repo: Repository<ProductOrmEntity>,
   ) {}
 
-  findById(id: number): Promise<Result<Product | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { id } }), wrapDbError);
+  async findById(id: number): Promise<Result<Product | null, InfrastructureError>> {
+    const result = await fromPromise(this.repo.findOne({ where: { id } }), wrapDbError);
+    return map(result, (orm) => (orm ? ProductMapper.toDomain(orm) : null));
   }
 
-  findByUuid(uuid: string): Promise<Result<Product | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { uuid } }), wrapDbError);
+  async findByUuid(uuid: string): Promise<Result<Product | null, InfrastructureError>> {
+    const result = await fromPromise(this.repo.findOne({ where: { uuid } }), wrapDbError);
+    return map(result, (orm) => (orm ? ProductMapper.toDomain(orm) : null));
   }
 
-  findAll(): Promise<Result<Product[], InfrastructureError>> {
-    return fromPromise(this.repo.find(), wrapDbError);
+  async findAll(): Promise<Result<Product[], InfrastructureError>> {
+    const result = await fromPromise(this.repo.find(), wrapDbError);
+    return map(result, (orms) => orms.map((o) => ProductMapper.toDomain(o)));
   }
 
-  findByCategoryId(categoryId: number): Promise<Result<Product[], InfrastructureError>> {
-    return fromPromise(this.repo.find({ where: { categoryId } }), wrapDbError);
+  async findByCategoryId(categoryId: number): Promise<Result<Product[], InfrastructureError>> {
+    const result = await fromPromise(this.repo.find({ where: { categoryId } }), wrapDbError);
+    return map(result, (orms) => orms.map((o) => ProductMapper.toDomain(o)));
   }
 
-  save(entity: Product): Promise<Result<Product, InfrastructureError>> {
-    return fromPromise(this.repo.save(entity), wrapDbError);
+  async save(entity: Product): Promise<Result<Product, InfrastructureError>> {
+    const orm = ProductMapper.toOrm(entity);
+    const result = await fromPromise(this.repo.save(orm), wrapDbError);
+    return map(result, (o) => ProductMapper.toDomain(o));
   }
 
   async delete(id: number): Promise<Result<boolean, InfrastructureError>> {

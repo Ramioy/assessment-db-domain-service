@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ALL_ENTITIES } from '@domain/models';
+import { ALL_ORM_ENTITIES } from '@infrastructure/persistence/entities';
 
 /**
  * TypeORM configuration factory.
@@ -13,7 +13,7 @@ export const databaseConfig = (config: ConfigService): TypeOrmModuleOptions => (
   username: config.get<string>('DB_USERNAME'),
   password: config.get<string>('DB_PASSWORD'),
   database: config.get<string>('DB_DATABASE'),
-  entities: [...ALL_ENTITIES],
+  entities: [...ALL_ORM_ENTITIES],
   synchronize: config.get<boolean>('DB_SYNCHRONIZE', false),
   logging: config.get<boolean>('DB_LOGGING', false),
   ssl: config.get<boolean>('DB_SSL', false)

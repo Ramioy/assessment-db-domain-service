@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Transaction } from '@domain/models/transaction.entity';
-import { TransactionStatus } from '@domain/models/transaction-status.entity';
+import { TransactionOrmEntity } from '@infrastructure/persistence/entities/transaction.orm-entity';
+import { TransactionStatusOrmEntity } from '@infrastructure/persistence/entities/transaction-status.orm-entity';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { TransactionRepository } from '@infrastructure/adapters/database/transaction.repository';
 import { TransactionStatusRepository } from '@infrastructure/adapters/database/transaction-status.repository';
@@ -14,7 +14,7 @@ import { CustomerModule } from '../customer/customer.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Transaction, TransactionStatus]),
+    TypeOrmModule.forFeature([TransactionOrmEntity, TransactionStatusOrmEntity]),
     // CreateTransactionUseCase validates customer existence via CustomerRepositoryPort
     CustomerModule,
   ],

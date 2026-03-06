@@ -19,7 +19,7 @@ export class CreateProductCategoryUseCase {
       return err(new AlreadyExistsError('ProductCategory', 'name', dto.name));
     }
 
-    const entity = Object.assign(new ProductCategory(), dto);
+    const entity = ProductCategory.create(dto);
     return this.repository.save(entity);
   }
 }

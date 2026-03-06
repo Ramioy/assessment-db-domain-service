@@ -1,43 +1,55 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { Customer } from './customer.entity';
-import type { TransactionStatus } from './transaction-status.entity';
-import type { Delivery } from './delivery.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('transactions')
-export class Transaction extends BaseEntity {
-  @Column({ name: 'customer_id' })
-  customerId: number;
-
+export class Transaction {
+  readonly id: number;
+  readonly customerId: number;
   /**
    * "cut" — kept as-is from diagram.
    * Likely represents a billing cut / instalment reference.
    */
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  cut: string | null;
+  readonly cut: string | null;
+  readonly transactionStatusId: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ name: 'transaction_status_id' })
-  transactionStatusId: number;
+  private constructor(props: TransactionDto) {
+    this.id = props.id;
+    this.customerId = props.customerId;
+    this.cut = props.cut ?? null;
+    this.transactionStatusId = props.transactionStatusId;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  // Relations
-  @ManyToOne('Customer', (c: Customer) => c.transactions, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'customer_id' })
-  customer: Customer;
+  static create(dto: CreateTransactionDto): Transaction {
+    const now = new Date();
+    return new Transaction({
+      id: 0,
+      customerId: dto.customerId,
+      cut: dto.cut ?? null,
+      transactionStatusId: dto.transactionStatusId,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
-  @ManyToOne('TransactionStatus', (ts: TransactionStatus) => ts.transactions, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'transaction_status_id' })
-  status: TransactionStatus;
+  static fromPersistence(props: TransactionDto): Transaction {
+    return new Transaction(props);
+  }
 
-  @OneToMany('Delivery', (d: Delivery) => d.transaction)
-  deliveries: Delivery[];
+  applyUpdate(dto: UpdateTransactionDto): Transaction {
+    return new Transaction({
+      id: this.id,
+      customerId: dto.customerId ?? this.customerId,
+      cut: dto.cut !== undefined ? dto.cut : this.cut,
+      transactionStatusId: dto.transactionStatusId ?? this.transactionStatusId,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────

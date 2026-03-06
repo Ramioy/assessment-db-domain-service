@@ -1,43 +1,47 @@
-import { Entity, Column, ManyToOne, JoinColumn, Generated } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { Customer } from './customer.entity';
-import type { Transaction } from './transaction.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('deliveries')
-export class Delivery extends BaseEntity {
-  @Column({ type: 'uuid', unique: true })
-  @Generated('uuid')
-  uuid: string;
-
-  @Column({ name: 'customer_id' })
-  customerId: number;
-
+export class Delivery {
+  readonly id: number;
+  readonly uuid: string;
+  readonly customerId: number;
   /**
    * customer_address_id — references a customer address record.
    * If a separate CustomerAddress entity exists, add the relation here.
    */
-  @Column({ name: 'customer_address_id', nullable: true })
-  customerAddressId: number | null;
+  readonly customerAddressId: number | null;
+  readonly transactionId: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ name: 'transaction_id' })
-  transactionId: number;
+  private constructor(props: DeliveryDto) {
+    this.id = props.id;
+    this.uuid = props.uuid;
+    this.customerId = props.customerId;
+    this.customerAddressId = props.customerAddressId ?? null;
+    this.transactionId = props.transactionId;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  // Relations
-  @ManyToOne('Customer', (c: Customer) => c.deliveries, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'customer_id' })
-  customer: Customer;
+  static create(dto: CreateDeliveryDto): Delivery {
+    const now = new Date();
+    return new Delivery({
+      id: 0,
+      uuid: '', // assigned by DB
+      customerId: dto.customerId,
+      customerAddressId: dto.customerAddressId ?? null,
+      transactionId: dto.transactionId,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
-  @ManyToOne('Transaction', (tx: Transaction) => tx.deliveries, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'transaction_id' })
-  transaction: Transaction;
+  static fromPersistence(props: DeliveryDto): Delivery {
+    return new Delivery(props);
+  }
 }
 
 // ─────────────────────────────────────────────

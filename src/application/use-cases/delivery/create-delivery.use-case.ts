@@ -31,7 +31,7 @@ export class CreateDeliveryUseCase {
       return err(new NotFoundError('Transaction', dto.transactionId));
     }
 
-    const entity = Object.assign(new Delivery(), dto);
+    const entity = Delivery.create(dto);
     return this.deliveryRepository.save(entity);
   }
 }

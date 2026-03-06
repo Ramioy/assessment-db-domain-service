@@ -1,22 +1,47 @@
-import { Entity, Column, OneToMany } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { Product } from './product.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('product_categories')
-export class ProductCategory extends BaseEntity {
-  @Column({ type: 'varchar', length: 255 })
-  name: string;
+export class ProductCategory {
+  readonly id: number;
+  readonly name: string;
+  readonly description: string | null;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  private constructor(props: ProductCategoryDto) {
+    this.id = props.id;
+    this.name = props.name;
+    this.description = props.description ?? null;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  // Relations
-  @OneToMany('Product', (product: Product) => product.category)
-  products: Product[];
+  static create(dto: CreateProductCategoryDto): ProductCategory {
+    const now = new Date();
+    return new ProductCategory({
+      id: 0,
+      name: dto.name,
+      description: dto.description ?? null,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  static fromPersistence(props: ProductCategoryDto): ProductCategory {
+    return new ProductCategory(props);
+  }
+
+  applyUpdate(dto: UpdateProductCategoryDto): ProductCategory {
+    return new ProductCategory({
+      id: this.id,
+      name: dto.name ?? this.name,
+      description: dto.description !== undefined ? dto.description : this.description,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────

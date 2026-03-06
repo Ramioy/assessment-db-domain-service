@@ -22,7 +22,7 @@ export class CreateProductUseCase {
       return err(new NotFoundError('ProductCategory', dto.categoryId));
     }
 
-    const entity = Object.assign(new Product(), dto);
+    const entity = Product.create(dto);
     return this.productRepository.save(entity);
   }
 }

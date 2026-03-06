@@ -28,7 +28,7 @@ export class UpdateTransactionUseCase {
       }
     }
 
-    Object.assign(findResult.value, dto);
-    return this.transactionRepository.save(findResult.value);
+    const updated = findResult.value.applyUpdate(dto);
+    return this.transactionRepository.save(updated);
   }
 }

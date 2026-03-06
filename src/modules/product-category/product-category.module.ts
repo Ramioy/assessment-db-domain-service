@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductCategory } from '@domain/models/product-category.entity';
+import { ProductCategoryOrmEntity } from '@infrastructure/persistence/entities/product-category.orm-entity';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { ProductCategoryRepository } from '@infrastructure/adapters/database/product-category.repository';
 import { CreateProductCategoryUseCase } from '@application/use-cases/product-category/create-product-category.use-case';
@@ -11,7 +11,7 @@ import { DeleteProductCategoryUseCase } from '@application/use-cases/product-cat
 import { ProductCategoryController } from '@presentation/controllers/product-category.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductCategory])],
+  imports: [TypeOrmModule.forFeature([ProductCategoryOrmEntity])],
   controllers: [ProductCategoryController],
   providers: [
     CreateProductCategoryUseCase,

@@ -1,28 +1,74 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { Product } from './product.entity';
+import { baseSchema } from '@shared/base.entity';
+import { ok, err, type Result } from '@shared/result';
+import { InsufficientStockError } from '@domain/errors';
 
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('stocks')
-export class Stock extends BaseEntity {
-  @Column({ name: 'product_id' })
-  productId: number;
+export class Stock {
+  readonly id: number;
+  readonly productId: number;
+  readonly description: string | null;
+  readonly quantity: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  private constructor(props: StockDto) {
+    this.id = props.id;
+    this.productId = props.productId;
+    this.description = props.description ?? null;
+    this.quantity = props.quantity;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  @Column({ type: 'int', default: 0 })
-  quantity: number;
+  static create(dto: CreateStockDto): Stock {
+    const now = new Date();
+    return new Stock({
+      id: 0,
+      productId: dto.productId,
+      description: dto.description ?? null,
+      quantity: dto.quantity ?? 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
-  // Relations
-  @OneToOne('Product', (product: Product) => product.stock, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
+  static fromPersistence(props: StockDto): Stock {
+    return new Stock(props);
+  }
+
+  applyUpdate(dto: UpdateStockDto): Stock {
+    return new Stock({
+      id: this.id,
+      productId: this.productId,
+      description: dto.description !== undefined ? dto.description : this.description,
+      quantity: dto.quantity ?? this.quantity,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
+
+  hasEnough(qty: number): boolean {
+    return qty > 0 && this.quantity >= qty;
+  }
+
+  decrement(qty: number): Result<Stock, InsufficientStockError> {
+    if (qty <= 0 || this.quantity < qty) {
+      return err(new InsufficientStockError(this.productId, qty, this.quantity));
+    }
+    return ok(
+      new Stock({
+        id: this.id,
+        productId: this.productId,
+        description: this.description,
+        quantity: this.quantity - qty,
+        createdAt: this.createdAt,
+        updatedAt: new Date(),
+      }),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────

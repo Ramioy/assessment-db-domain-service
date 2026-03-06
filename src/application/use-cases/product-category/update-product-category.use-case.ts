@@ -20,7 +20,7 @@ export class UpdateProductCategoryUseCase {
     if (!findResult.ok) return findResult;
     if (!findResult.value) return err(new NotFoundError('ProductCategory', id));
 
-    Object.assign(findResult.value, dto);
-    return this.repository.save(findResult.value);
+    const updated = findResult.value.applyUpdate(dto);
+    return this.repository.save(updated);
   }
 }

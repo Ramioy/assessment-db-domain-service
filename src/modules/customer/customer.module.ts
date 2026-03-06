@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Customer } from '@domain/models/customer.entity';
-import { CustomerDocumentType } from '@domain/models/customer-document-type.entity';
+import { CustomerOrmEntity } from '@infrastructure/persistence/entities/customer.orm-entity';
+import { CustomerDocumentTypeOrmEntity } from '@infrastructure/persistence/entities/customer-document-type.orm-entity';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { CustomerRepository } from '@infrastructure/adapters/database/customer.repository';
 import { CustomerDocumentTypeRepository } from '@infrastructure/adapters/database/customer-document-type.repository';
@@ -13,7 +13,7 @@ import { DeleteCustomerUseCase } from '@application/use-cases/customer/delete-cu
 import { CustomerController } from '@presentation/controllers/customer.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Customer, CustomerDocumentType])],
+  imports: [TypeOrmModule.forFeature([CustomerOrmEntity, CustomerDocumentTypeOrmEntity])],
   controllers: [CustomerController],
   providers: [
     CreateCustomerUseCase,

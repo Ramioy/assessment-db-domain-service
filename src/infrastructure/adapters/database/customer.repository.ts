@@ -3,38 +3,45 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from '@domain/models/customer.entity';
 import { CustomerRepositoryPort } from '@application/ports/out/customer-repository.port';
-import { fromPromise, type Result } from '@shared/result';
-
+import { fromPromise, map, type Result } from '@shared/result';
+import { CustomerOrmEntity } from '@infrastructure/persistence/entities/customer.orm-entity';
+import { CustomerMapper } from '@infrastructure/persistence/mappers/customer.mapper';
 import { wrapDbError } from './base.repository';
 import type { InfrastructureError } from '@shared/errors';
 
 @Injectable()
 export class CustomerRepository implements CustomerRepositoryPort {
   constructor(
-    @InjectRepository(Customer)
-    private readonly repo: Repository<Customer>,
+    @InjectRepository(CustomerOrmEntity)
+    private readonly repo: Repository<CustomerOrmEntity>,
   ) {}
 
-  findById(id: number): Promise<Result<Customer | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { id } }), wrapDbError);
+  async findById(id: number): Promise<Result<Customer | null, InfrastructureError>> {
+    const result = await fromPromise(this.repo.findOne({ where: { id } }), wrapDbError);
+    return map(result, (orm) => (orm ? CustomerMapper.toDomain(orm) : null));
   }
 
-  findByEmail(email: string): Promise<Result<Customer | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { email } }), wrapDbError);
+  async findByEmail(email: string): Promise<Result<Customer | null, InfrastructureError>> {
+    const result = await fromPromise(this.repo.findOne({ where: { email } }), wrapDbError);
+    return map(result, (orm) => (orm ? CustomerMapper.toDomain(orm) : null));
   }
 
-  findByDocumentNumber(
+  async findByDocumentNumber(
     documentNumber: string,
   ): Promise<Result<Customer | null, InfrastructureError>> {
-    return fromPromise(this.repo.findOne({ where: { documentNumber } }), wrapDbError);
+    const result = await fromPromise(this.repo.findOne({ where: { documentNumber } }), wrapDbError);
+    return map(result, (orm) => (orm ? CustomerMapper.toDomain(orm) : null));
   }
 
-  findAll(): Promise<Result<Customer[], InfrastructureError>> {
-    return fromPromise(this.repo.find(), wrapDbError);
+  async findAll(): Promise<Result<Customer[], InfrastructureError>> {
+    const result = await fromPromise(this.repo.find(), wrapDbError);
+    return map(result, (orms) => orms.map((o) => CustomerMapper.toDomain(o)));
   }
 
-  save(entity: Customer): Promise<Result<Customer, InfrastructureError>> {
-    return fromPromise(this.repo.save(entity), wrapDbError);
+  async save(entity: Customer): Promise<Result<Customer, InfrastructureError>> {
+    const orm = CustomerMapper.toOrm(entity);
+    const result = await fromPromise(this.repo.save(orm), wrapDbError);
+    return map(result, (o) => CustomerMapper.toDomain(o));
   }
 
   async delete(id: number): Promise<Result<boolean, InfrastructureError>> {

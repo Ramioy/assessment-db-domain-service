@@ -1,42 +1,59 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { CustomerDocumentType } from './customer-document-type.entity';
-import type { Transaction } from './transaction.entity';
-import type { Delivery } from './delivery.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('customers')
-export class Customer extends BaseEntity {
-  @Column({ name: 'customer_document_type_id' })
-  customerDocumentTypeId: number;
+export class Customer {
+  readonly id: number;
+  readonly customerDocumentTypeId: number;
+  readonly documentNumber: string;
+  readonly email: string;
+  readonly contactPhone: string | null;
+  readonly address: string | null;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ name: 'document_number', type: 'varchar', length: 50, unique: true })
-  documentNumber: string;
+  private constructor(props: CustomerDto) {
+    this.id = props.id;
+    this.customerDocumentTypeId = props.customerDocumentTypeId;
+    this.documentNumber = props.documentNumber;
+    this.email = props.email;
+    this.contactPhone = props.contactPhone ?? null;
+    this.address = props.address ?? null;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  email: string;
+  static create(dto: CreateCustomerDto): Customer {
+    const now = new Date();
+    return new Customer({
+      id: 0,
+      customerDocumentTypeId: dto.customerDocumentTypeId,
+      documentNumber: dto.documentNumber,
+      email: dto.email,
+      contactPhone: dto.contactPhone ?? null,
+      address: dto.address ?? null,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
-  @Column({ name: 'contact_phone', type: 'varchar', length: 30, nullable: true })
-  contactPhone: string | null;
+  static fromPersistence(props: CustomerDto): Customer {
+    return new Customer(props);
+  }
 
-  @Column({ name: 'address', type: 'text', nullable: true })
-  address: string | null;
-
-  // Relations
-  @ManyToOne('CustomerDocumentType', (dt: CustomerDocumentType) => dt.customers, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'customer_document_type_id' })
-  documentType: CustomerDocumentType;
-
-  @OneToMany('Transaction', (tx: Transaction) => tx.customer)
-  transactions: Transaction[];
-
-  @OneToMany('Delivery', (d: Delivery) => d.customer)
-  deliveries: Delivery[];
+  applyUpdate(dto: UpdateCustomerDto): Customer {
+    return new Customer({
+      id: this.id,
+      customerDocumentTypeId: dto.customerDocumentTypeId ?? this.customerDocumentTypeId,
+      documentNumber: dto.documentNumber ?? this.documentNumber,
+      email: dto.email ?? this.email,
+      contactPhone: dto.contactPhone !== undefined ? dto.contactPhone : this.contactPhone,
+      address: dto.address !== undefined ? dto.address : this.address,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────

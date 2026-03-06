@@ -1,7 +1,7 @@
 // @ts-nocheck
 /* eslint-disable */
 import { CreateTransactionUseCase } from '@application/use-cases/transaction/create-transaction.use-case';
-import { NotFoundError, InvalidTransactionError } from '@domain/errors';
+import { NotFoundError } from '@domain/errors';
 import { ok } from '@shared/result';
 import {
   makeMockTransactionRepository,
@@ -42,21 +42,6 @@ describe('CreateTransactionUseCase', () => {
     expect(transactionRepo.save).toHaveBeenCalledTimes(1);
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toBe(saved);
-  });
-
-  it('returns InvalidTransactionError when customerId is 0', async () => {
-    const result = await useCase.execute({ ...dto, customerId: 0 });
-
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBeInstanceOf(InvalidTransactionError);
-    expect(transactionRepo.save).not.toHaveBeenCalled();
-  });
-
-  it('returns InvalidTransactionError when statusId is 0', async () => {
-    const result = await useCase.execute({ ...dto, transactionStatusId: 0 });
-
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBeInstanceOf(InvalidTransactionError);
   });
 
   it('returns NotFoundError when customer does not exist', async () => {

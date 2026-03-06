@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Delivery } from '@domain/models/delivery.entity';
+import { DeliveryOrmEntity } from '@infrastructure/persistence/entities/delivery.orm-entity';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { DeliveryRepository } from '@infrastructure/adapters/database/delivery.repository';
 import { CreateDeliveryUseCase } from '@application/use-cases/delivery/create-delivery.use-case';
@@ -13,7 +13,7 @@ import { TransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Delivery]),
+    TypeOrmModule.forFeature([DeliveryOrmEntity]),
     // CreateDeliveryUseCase validates customer via CustomerRepositoryPort
     CustomerModule,
     // CreateDeliveryUseCase + FindDeliveriesByTransactionUseCase use TransactionRepositoryPort

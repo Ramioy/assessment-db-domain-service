@@ -1,39 +1,59 @@
-import { Entity, Column, ManyToOne, OneToOne, JoinColumn, Generated } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { ProductCategory } from './product-category.entity';
-import type { Stock } from './stock.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('products')
-export class Product extends BaseEntity {
-  @Column({ type: 'uuid', unique: true })
-  @Generated('uuid')
-  uuid: string;
+export class Product {
+  readonly id: number;
+  readonly uuid: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly imageUrl: string | null;
+  readonly categoryId: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ type: 'varchar', length: 255 })
-  name: string;
+  private constructor(props: ProductDto) {
+    this.id = props.id;
+    this.uuid = props.uuid;
+    this.name = props.name;
+    this.description = props.description ?? null;
+    this.imageUrl = props.imageUrl ?? null;
+    this.categoryId = props.categoryId;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  static create(dto: CreateProductDto): Product {
+    const now = new Date();
+    return new Product({
+      id: 0,
+      uuid: '', // assigned by DB
+      name: dto.name,
+      description: dto.description ?? null,
+      imageUrl: dto.imageUrl ?? null,
+      categoryId: dto.categoryId,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
-  @Column({ name: 'image_url', type: 'varchar', length: 2048, nullable: true })
-  imageUrl: string | null;
+  static fromPersistence(props: ProductDto): Product {
+    return new Product(props);
+  }
 
-  @Column({ name: 'category_id' })
-  categoryId: number;
-
-  // Relations
-  @ManyToOne('ProductCategory', (cat: ProductCategory) => cat.products, {
-    onDelete: 'RESTRICT',
-  })
-  @JoinColumn({ name: 'category_id' })
-  category: ProductCategory;
-
-  @OneToOne('Stock', (stock: Stock) => stock.product)
-  stock: Stock;
+  applyUpdate(dto: UpdateProductDto): Product {
+    return new Product({
+      id: this.id,
+      uuid: this.uuid,
+      name: dto.name ?? this.name,
+      description: dto.description !== undefined ? dto.description : this.description,
+      imageUrl: dto.imageUrl !== undefined ? dto.imageUrl : this.imageUrl,
+      categoryId: dto.categoryId ?? this.categoryId,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────

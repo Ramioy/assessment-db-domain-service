@@ -1,22 +1,47 @@
-import { Entity, Column, OneToMany } from 'typeorm';
 import { z } from 'zod';
-import { BaseEntity, baseSchema } from './base.entity';
-import type { Customer } from './customer.entity';
-
+import { baseSchema } from '@shared/base.entity';
 // ─────────────────────────────────────────────
 //  Entity
 // ─────────────────────────────────────────────
-@Entity('customer_document_types')
-export class CustomerDocumentType extends BaseEntity {
-  @Column({ type: 'varchar', length: 100 })
-  name: string;
+export class CustomerDocumentType {
+  readonly id: number;
+  readonly name: string;
+  readonly description: string | null;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  private constructor(props: CustomerDocumentTypeDto) {
+    this.id = props.id;
+    this.name = props.name;
+    this.description = props.description ?? null;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
 
-  // Relations
-  @OneToMany('Customer', (customer: Customer) => customer.documentType)
-  customers: Customer[];
+  static create(dto: CreateCustomerDocumentTypeDto): CustomerDocumentType {
+    const now = new Date();
+    return new CustomerDocumentType({
+      id: 0,
+      name: dto.name,
+      description: dto.description ?? null,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  static fromPersistence(props: CustomerDocumentTypeDto): CustomerDocumentType {
+    return new CustomerDocumentType(props);
+  }
+
+  applyUpdate(dto: UpdateCustomerDocumentTypeDto): CustomerDocumentType {
+    return new CustomerDocumentType({
+      id: this.id,
+      name: dto.name ?? this.name,
+      description: dto.description !== undefined ? dto.description : this.description,
+      createdAt: this.createdAt,
+      updatedAt: new Date(),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────

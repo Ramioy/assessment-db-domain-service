@@ -20,13 +20,12 @@ const NOW = new Date('2024-01-15T10:00:00.000Z');
 // ── ProductCategory ───────────────────────────────────────────
 
 export function makeProductCategory(overrides: Partial<ProductCategory> = {}): ProductCategory {
-  return Object.assign(new ProductCategory(), {
+  return ProductCategory.fromPersistence({
     id: 1,
     name: 'Electronics',
     description: 'Electronic devices and accessories',
     createdAt: NOW,
     updatedAt: NOW,
-    products: [],
     ...overrides,
   });
 }
@@ -34,7 +33,7 @@ export function makeProductCategory(overrides: Partial<ProductCategory> = {}): P
 // ── Product ───────────────────────────────────────────────────
 
 export function makeProduct(overrides: Partial<Product> = {}): Product {
-  return Object.assign(new Product(), {
+  return Product.fromPersistence({
     id: 1,
     uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     name: 'Laptop Pro',
@@ -50,7 +49,7 @@ export function makeProduct(overrides: Partial<Product> = {}): Product {
 // ── Stock ─────────────────────────────────────────────────────
 
 export function makeStock(overrides: Partial<Stock> = {}): Stock {
-  return Object.assign(new Stock(), {
+  return Stock.fromPersistence({
     id: 1,
     productId: 1,
     description: 'Warehouse A',
@@ -66,13 +65,12 @@ export function makeStock(overrides: Partial<Stock> = {}): Stock {
 export function makeCustomerDocumentType(
   overrides: Partial<CustomerDocumentType> = {},
 ): CustomerDocumentType {
-  return Object.assign(new CustomerDocumentType(), {
+  return CustomerDocumentType.fromPersistence({
     id: 1,
     name: 'CC',
     description: 'Cédula de Ciudadanía',
     createdAt: NOW,
     updatedAt: NOW,
-    customers: [],
     ...overrides,
   });
 }
@@ -80,7 +78,7 @@ export function makeCustomerDocumentType(
 // ── Customer ──────────────────────────────────────────────────
 
 export function makeCustomer(overrides: Partial<Customer> = {}): Customer {
-  return Object.assign(new Customer(), {
+  return Customer.fromPersistence({
     id: 1,
     customerDocumentTypeId: 1,
     documentNumber: '123456789',
@@ -89,8 +87,6 @@ export function makeCustomer(overrides: Partial<Customer> = {}): Customer {
     address: 'Calle 1 # 2-3',
     createdAt: NOW,
     updatedAt: NOW,
-    transactions: [],
-    deliveries: [],
     ...overrides,
   });
 }
@@ -100,13 +96,12 @@ export function makeCustomer(overrides: Partial<Customer> = {}): Customer {
 export function makeTransactionStatus(
   overrides: Partial<TransactionStatus> = {},
 ): TransactionStatus {
-  return Object.assign(new TransactionStatus(), {
+  return TransactionStatus.fromPersistence({
     id: 1,
     name: 'PENDING',
     description: 'Awaiting processing',
     createdAt: NOW,
     updatedAt: NOW,
-    transactions: [],
     ...overrides,
   });
 }
@@ -114,14 +109,13 @@ export function makeTransactionStatus(
 // ── Transaction ───────────────────────────────────────────────
 
 export function makeTransaction(overrides: Partial<Transaction> = {}): Transaction {
-  return Object.assign(new Transaction(), {
+  return Transaction.fromPersistence({
     id: 1,
     customerId: 1,
     cut: null,
     transactionStatusId: 1,
     createdAt: NOW,
     updatedAt: NOW,
-    deliveries: [],
     ...overrides,
   });
 }
@@ -129,7 +123,7 @@ export function makeTransaction(overrides: Partial<Transaction> = {}): Transacti
 // ── Delivery ──────────────────────────────────────────────────
 
 export function makeDelivery(overrides: Partial<Delivery> = {}): Delivery {
-  return Object.assign(new Delivery(), {
+  return Delivery.fromPersistence({
     id: 1,
     uuid: 'dddddddd-eeee-ffff-0000-111122223333',
     customerId: 1,

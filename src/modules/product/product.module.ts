@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from '@domain/models/product.entity';
+import { ProductOrmEntity } from '@infrastructure/persistence/entities/product.orm-entity';
 import { DI_TOKENS } from '@shared/di-tokens';
 import { ProductRepository } from '@infrastructure/adapters/database/product.repository';
 import { CreateProductUseCase } from '@application/use-cases/product/create-product.use-case';
@@ -13,7 +13,7 @@ import { ProductCategoryModule } from '../product-category/product-category.modu
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product]),
+    TypeOrmModule.forFeature([ProductOrmEntity]),
     // CreateProductUseCase validates category existence via ProductCategoryRepositoryPort
     ProductCategoryModule,
   ],

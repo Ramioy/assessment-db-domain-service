@@ -34,7 +34,7 @@ export class CreateCustomerUseCase {
       return err(new AlreadyExistsError('Customer', 'documentNumber', dto.documentNumber));
     }
 
-    const entity = Object.assign(new Customer(), dto);
+    const entity = Customer.create(dto);
     return this.customerRepository.save(entity);
   }
 }
